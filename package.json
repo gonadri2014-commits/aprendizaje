@@ -1,0 +1,24 @@
+{
+  "name": "aprendizaje",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gonadri2014-commits/aprendizaje.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gonadri2014-commits/aprendizaje/issues"
+  },
+  "homepage": "https://github.com/gonadri2014-commits/aprendizaje#readme",
+  "devDependencies": {
+    "@playwright/mcp": "^0.0.83",
+    "@playwright/test": "^1.63.0"
+  }
+}
