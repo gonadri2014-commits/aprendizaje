@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dental Medrano Stock</title>
+<style>
+:root{--bg:#f5f7f8;--card:#fff;--tx:#1d2b33;--mut:#66757f;--acc:#0b7a75;--acc2:#e3f3f2;--warn:#c0392b;--ok:#1e8e3e;--line:#dde3e6;--mue:#7b4fc9}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11181c;--card:#1a2328;--tx:#e6edf0;--mut:#93a3ab;--acc:#3cc1b9;--acc2:#183332;--line:#2c383e;--mue:#b293f0}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.4 system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+header{background:var(--acc);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header h1{margin:0;font-size:18px}nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:transparent;color:#fff;border:1px solid #fff6;border-radius:6px;padding:6px 10px;cursor:pointer}
+nav button.on{background:#fff;color:var(--acc)}
+main{max-width:1100px;margin:auto;padding:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:16px}label{display:block;font-size:13px;color:var(--mut);margin:6px 0 2px}
+input,select{width:100%;padding:9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--tx);font-size:15px}
+input.scan{font-size:18px;border:2px solid var(--acc)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+button.b{background:var(--acc);color:#fff;border:0;border-radius:6px;padding:9px 14px;cursor:pointer;margin-top:10px}
+button.s{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:6px;border-bottom:1px solid var(--line)}
+.tw{overflow-x:auto}.msg{padding:10px;border-radius:6px;margin-top:10px;font-weight:600}
+.msg.ok{background:#1e8e3e22;color:var(--ok)}.msg.err{background:#c0392b22;color:var(--warn)}
+.loc{font-family:ui-monospace,monospace;font-weight:700;background:var(--acc2);padding:2px 6px;border-radius:4px}
+.tag{font-size:11px;padding:1px 6px;border-radius:10px;background:var(--mue);color:#fff}
+.done td{opacity:.45;text-decoration:line-through}.cur td{background:var(--acc2)}
+.map{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px}.aisle{min-width:90px}.aisle h3{margin:0 0 4px;font-size:13px;text-align:center}
+.slot{border:1px solid var(--line);border-radius:4px;padding:3px;margin-bottom:3px;font-size:11px;min-height:34px;position:relative}
+.slot b{font-family:ui-monospace,monospace}.slot.hit{background:var(--acc);color:#fff}.slot.m{border-color:var(--mue)}
+.slot i{position:absolute;right:3px;top:2px;font-style:normal;background:#fff;color:var(--acc);border-radius:50%;width:18px;height:18px;text-align:center;font-weight:700}
+.hint{color:var(--mut);font-size:13px}.hide{display:none}
+</style>
+</head>
+<body>
+<header><h1>Dental Medrano · Stock y Armado</h1>
+<nav id="tabs"><button data-t="ing" class="on">Ingreso</button><button data-t="des">Despacho</button><button data-t="mue">Muestras</button><button data-t="stk">Stock y Mapa</button></nav></header>
+<main>
+<!-- INGRESO -->
+<section id="ing">
+ <div class="card"><h2>1. Escanear producto</h2>
+  <input class="scan" id="iScan" placeholder="Escaneá el código de barras (EAN o GS1-128) y Enter" autofocus>
+  <p class="hint">Prueba: 7791000000151 (Lima K #15) · GS1: 01077910000001681727123110L-2391 (Lima #20, vto 31/12/27, lote L-2391)</p>
+  <div id="iForm" class="hide">
+   <p id="iProd"></p>
+   <div class="row"><div><label>Lote</label><input id="iLote"></div><div><label>Vencimiento</label><input id="iVto" type="date"></div>
+   <div><label>Cantidad</label><input id="iCant" type="number" value="1" min="1"></div>
+   <div><label>Destino</label><select id="iTipo"><option value="venta">Stock venta</option><option value="muestra">Muestra (zona M)</option></select></div></div>
+   <p>Guardar en: <span class="loc" id="iLoc"></span></p>
+   <label>Escaneá la etiqueta de la ubicación para confirmar</label><input class="scan" id="iLocScan" placeholder="ej. A-01-1">
+  </div><div id="iMsg"></div></div>
+</section>
+<!-- DESPACHO -->
+<section id="des" class="hide">
+ <div class="card"><h2>0. Armador</h2><input class="scan" id="aScan" placeholder="Escaneá tu credencial, ej. ARM-01"><p class="hint">Prueba: ARM-01 (Fede), ARM-02 (Lucas)</p><div id="aMsg"></div></div>
+ <div class="card"><h2>1. Escanear remitos (se pueden juntar varios = 1 sola recorrida)</h2>
+  <input class="scan" id="dScan" placeholder="Código del remito, ej. R-0001">
+  <p class="hint">Remitos de prueba: R-0001, R-0002, R-0003</p>
+  <div id="dList"></div><button class="b" id="dGo">Generar recorrida</button> <button class="b s" id="dClr">Limpiar</button><div id="dMsg"></div></div>
+ <div class="card hide" id="dPick"><h2>2. Recorrida de armado</h2>
+  <label>Escaneá el producto del paso resaltado (valida tamaño y lote)</label><input class="scan" id="pScan" placeholder="EAN del producto">
+  <div id="pMsg"></div><div class="tw"><table id="pTab"></table></div></div>
+ <div class="card hide" id="dSplit"><h2>3. Separar por pedido</h2><div id="dSplitBody"></div></div>
+</section>
+<!-- MUESTRAS -->
+<section id="mue" class="hide">
+ <div class="card"><h2>Retiro de muestra (zona M, stock separado)</h2>
+  <div class="row"><div><label>Responsable</label><input id="mResp" placeholder="Vendedor"></div><div><label>Destino / cliente</label><input id="mDest"></div></div>
+  <label>Escaneá la muestra</label><input class="scan" id="mScan" placeholder="EAN"><div id="mMsg"></div></div>
+ <div class="card"><h2>Stock de muestras</h2><div class="tw"><table id="mStk"></table></div></div>
+ <p class="hint" style="margin:-6px 0 14px">Regla: toda entrada/salida de la zona M se hace con remito interno (botones "Volver a venta" / "Derivar a muestras").</p>
+ <div class="card"><h2>Movimientos de muestras</h2><div class="tw"><table id="mLog"></table></div></div>
+</section>
+<!-- STOCK -->
+<section id="stk" class="hide">
+ <div class="card"><h2>⚠ Alertas de vencimiento (próximos 90 días)</h2><div class="tw"><table id="vTab"></table></div></div>
+ <div class="card"><h2>KPIs por armador</h2><div class="tw"><table id="kTab"></table></div></div>
+ <div class="card"><h2>Mapa del depósito</h2><p class="hint">Recorrido en serpentina: A sube, B baja, C sube… Los números marcan el orden de la última recorrida.</p><div class="map" id="map"></div></div>
+ <div class="card"><h2>Stock por lote (FEFO)</h2><div class="tw"><table id="sTab"></table></div><button class="b s" id="reset">Restaurar datos de ejemplo</button></div>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+// ---------- Datos de ejemplo ----------
+const PROD=[
+ ['7791000000151','Lima K 21mm #15','LIMA-K','A-01-1'],['7791000000168','Lima K 21mm #20','LIMA-K','A-03-1'],['7791000000175','Lima K 21mm #25','LIMA-K','A-05-1'],
+ ['7791000000212','Guante nitrilo talle S','GUANTE','B-01-2'],['7791000000229','Guante nitrilo talle M','GUANTE','B-03-2'],['7791000000236','Guante nitrilo talle L','GUANTE','B-05-2'],
+ ['7791000000311','Composite A2 4g','COMP','C-02-2'],['7791000000328','Composite A3 4g','COMP','C-04-2'],
+ ['7791000000410','Fresa redonda #1','FRESA','D-01-1'],['7791000000427','Fresa redonda #2','FRESA','D-03-1'],['7791000000434','Anestesia carpule x50','ANEST','C-05-1']
+].map(([ean,desc,fam,loc])=>({ean,desc,fam,loc}));
+const REM={'R-0001':{cli:'Consultorio Dra. Pérez',l:[['7791000000168',3],['7791000000229',2],['7791000000311',1]]},
+ 'R-0002':{cli:'Clínica Odonto Sur',l:[['7791000000168',2],['7791000000434',1],['7791000000427',5]]},
+ 'R-0003':{cli:'Dr. Gómez',l:[['7791000000229',4],['7791000000151',2],['7791000000328',1]]}};
+const AISLES=['A','B','C','D','M'],SHELVES=5,LEVELS=2;
+const seed=()=>({stock:[
+ {ean:'7791000000151',lote:'L-1001',vto:'2027-03-31',loc:'A-01-1',q:20,t:'venta'},{ean:'7791000000168',lote:'L-2001',vto:'2026-12-31',loc:'A-03-1',q:4,t:'venta'},
+ {ean:'7791000000168',lote:'L-2002',vto:'2027-08-31',loc:'A-03-1',q:30,t:'venta'},{ean:'7791000000175',lote:'L-3001',vto:'2028-01-31',loc:'A-05-1',q:15,t:'venta'},
+ {ean:'7791000000229',lote:'G-77',vto:'2029-01-01',loc:'B-03-2',q:40,t:'venta'},{ean:'7791000000212',lote:'G-76',vto:'2029-01-01',loc:'B-01-2',q:25,t:'venta'},
+ {ean:'7791000000311',lote:'C-12',vto:'2027-05-01',loc:'C-02-2',q:10,t:'venta'},{ean:'7791000000328',lote:'C-13',vto:'2027-06-01',loc:'C-04-2',q:8,t:'venta'},
+ {ean:'7791000000427',lote:'F-5',vto:'2030-01-01',loc:'D-03-1',q:50,t:'venta'},{ean:'7791000000434',lote:'AN-9',vto:'2026-11-30',loc:'C-05-1',q:6,t:'venta'},
+ {ean:'7791000000311',lote:'C-12',vto:'2027-05-01',loc:'M-01-1',q:12,t:'muestra'}],log:[],kpi:[],ri:0});
+let DB;try{DB=JSON.parse(localStorage.getItem('dm'))}catch(e){}if(!DB||!DB.kpi)DB=seed();
+const save=()=>{try{localStorage.setItem('dm',JSON.stringify(DB))}catch(e){}};
+const P=ean=>PROD.find(p=>p.ean===ean);
+const msg=(el,t,ok)=>$(el).innerHTML=`<div class="msg ${ok?'ok':'err'}">${t}</div>`;
+const fmt=d=>d?d.split('-').reverse().join('/'):'';
+// Orden de recorrida: serpentina por pasillo
+const routeKey=loc=>{const[a,s,n]=loc.split('-');const ai=AISLES.indexOf(a);return ai*1000+(ai%2?SHELVES-+s:+s)*10+ +n};
+// GS1-128: (01)GTIN (17)vto AAMMDD (10)lote
+function parseScan(c){c=c.trim();if(/^01\d{14}/.test(c)){let ean=c.slice(3,16),r=c.slice(16),vto='',lote='';
+ if(r.startsWith('17')){const d=r.slice(2,8);vto=`20${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4,6)}`;r=r.slice(8)}
+ if(r.startsWith('10'))lote=r.slice(2);return{ean,vto,lote}}return{ean:c}}
+// ---------- Tabs ----------
+$('tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b===e.target));
+ ['ing','des','mue','stk'].forEach(s=>$(s).classList.toggle('hide',s!==t));render();const f=$(t).querySelector('input.scan');f&&f.focus()};
+// ---------- Ingreso ----------
+let cur=null;
+$('iScan').onkeydown=e=>{if(e.key!=='Enter')return;const s=parseScan(e.target.value);const p=P(s.ean);e.target.value='';
+ if(!p){$('iForm').classList.add('hide');return msg('iMsg','Código no encontrado en el maestro: '+s.ean+' → dar de alta el producto.',0)}
+ cur=p;$('iMsg').innerHTML='';$('iForm').classList.remove('hide');$('iProd').innerHTML=`<b>${p.desc}</b> · EAN ${p.ean}`;
+ $('iLote').value=s.lote||'';$('iVto').value=s.vto||'';$('iCant').value=1;$('iTipo').value='venta';updLoc();(s.lote?$('iCant'):$('iLote')).focus()};
+const destLoc=()=>$('iTipo').value==='muestra'?(DB.stock.find(x=>x.ean===cur.ean&&x.t==='muestra')||{loc:'M-0'+(1+PROD.indexOf(cur)%SHELVES)+'-1'}).loc:cur.loc;
+const updLoc=()=>$('iLoc').textContent=destLoc();$('iTipo').onchange=updLoc;
+$('iLocScan').onkeydown=e=>{if(e.key!=='Enter')return;const loc=e.target.value.trim().toUpperCase();e.target.value='';
+ if(!$('iLote').value||!$('iVto').value)return msg('iMsg','Falta lote o vencimiento.',0);
+ if(loc!==destLoc())return msg('iMsg',`Ubicación incorrecta (${loc}). Debe ir en ${destLoc()}.`,0);
+ const q=+$('iCant').value,t=$('iTipo').value,lote=$('iLote').value.trim();
+ const ex=DB.stock.find(x=>x.ean===cur.ean&&x.lote===lote&&x.loc===loc);ex?ex.q+=q:DB.stock.push({ean:cur.ean,lote,vto:$('iVto').value,loc,q,t});
+ DB.log.unshift({f:new Date().toLocaleString('es-AR'),tipo:'Ingreso '+t,desc:cur.desc,lote,q,quien:'-',dest:loc});save();
+ msg('iMsg',`✔ Ingresadas ${q} u. de ${cur.desc} lote ${lote} en ${loc}`,1);$('iForm').classList.add('hide');$('iScan').focus()};
+// ---------- Despacho (picking por oleada) ----------
+let wave=[],pick=[],step=0,lastRoute=[],arm=null,t0=0,errs=0;
+const ARM={'ARM-01':'Fede','ARM-02':'Lucas'};
+$('aScan').onkeydown=e=>{if(e.key!=='Enter')return;const c=e.target.value.trim().toUpperCase();e.target.value='';
+ if(!ARM[c])return msg('aMsg','Credencial no válida.',0);arm=c+' '+ARM[c];msg('aMsg','👤 Armando: '+arm,1);$('dScan').focus()};
+$('dScan').onkeydown=e=>{if(e.key!=='Enter')return;const r=e.target.value.trim().toUpperCase();e.target.value='';
+ if(!REM[r])return msg('dMsg','Remito no encontrado: '+r,0);if(wave.includes(r))return msg('dMsg','Ya está en la oleada.',0);
+ wave.push(r);$('dMsg').innerHTML='';$('dList').innerHTML=wave.map(w=>`<p>📄 <b>${w}</b> – ${REM[w].cli} (${REM[w].l.length} renglones)</p>`).join('')};
+$('dClr').onclick=()=>{wave=[];pick=[];$('dList').innerHTML='';['dPick','dSplit'].forEach(i=>$(i).classList.add('hide'))};
+$('dGo').onclick=()=>{if(!arm)return msg('dMsg','Primero escaneá tu credencial de armador.',0);if(!wave.length)return msg('dMsg','Escaneá al menos un remito.',0);
+ const need={};wave.forEach(r=>REM[r].l.forEach(([ean,q])=>need[ean]=(need[ean]||0)+q));pick=[];const falt=[];
+ for(const ean in need){let q=need[ean];const lots=DB.stock.filter(x=>x.ean===ean&&x.t==='venta'&&x.q>0).sort((a,b)=>a.vto.localeCompare(b.vto)); // FEFO
+  for(const l of lots){if(!q)break;const t=Math.min(q,l.q);pick.push({ean,lot:l,q:t,ok:false});q-=t}if(q)falt.push(`${P(ean).desc}: faltan ${q}`)}
+ pick.sort((a,b)=>routeKey(a.lot.loc)-routeKey(b.lot.loc));step=0;t0=Date.now();errs=0;lastRoute=[...new Set(pick.map(p=>p.lot.loc))];
+ const rengl=wave.reduce((s,r)=>s+REM[r].l.length,0);
+ msg('dMsg',`${wave.length} remito(s), ${rengl} renglones → ${lastRoute.length} paradas en una sola recorrida.`+(falt.length?'<br>⚠ '+falt.join(' · '):''),!falt.length);
+ $('dPick').classList.remove('hide');$('dSplit').classList.add('hide');drawPick();$('pScan').focus()};
+function drawPick(){$('pTab').innerHTML='<tr><th>#</th><th>Ir a</th><th>Producto</th><th>Lote / Vto</th><th>Cant.</th></tr>'+pick.map((p,i)=>
+ `<tr class="${p.ok?'done':i===step?'cur':''}"><td>${i+1}</td><td><span class="loc">${p.lot.loc}</span></td><td>${P(p.ean).desc}</td><td>${p.lot.lote} · ${fmt(p.lot.vto)}</td><td><b>${p.q}</b></td></tr>`).join('')}
+$('pScan').onkeydown=e=>{if(e.key!=='Enter')return;const s=parseScan(e.target.value);e.target.value='';const p=pick[step];if(!p)return;
+ if(s.ean!==p.ean){errs++;const o=P(s.ean);return msg('pMsg',o&&o.fam===P(p.ean).fam?`✖ TAMAÑO EQUIVOCADO: escaneaste "${o.desc}", se pide "${P(p.ean).desc}".`:`✖ Producto incorrecto. Se pide "${P(p.ean).desc}" en ${p.lot.loc}.`,0)}
+ let just='';if(s.lote&&s.lote!==p.lot.lote){errs++;const alt=DB.stock.find(x=>x.ean===p.ean&&x.lote===s.lote&&x.t==='venta'&&x.q>=p.q);
+  just=alt?(prompt(`Lote ${s.lote} no es el asignado (${p.lot.lote}, vence primero). Justificación para usarlo (vacío = rechazar):`)||'').trim():'';
+  if(!just)return msg('pMsg',`✖ Lote ${s.lote} rechazado: sacar lote ${p.lot.lote} (FEFO).`,0);p.lot=alt}
+ p.ok=true;p.lot.q-=p.q;DB.log.unshift({f:new Date().toLocaleString('es-AR'),tipo:'Egreso venta',desc:P(p.ean).desc,lote:p.lot.lote,q:p.q,quien:arm,dest:wave.join(','),just});save();
+ step++;msg('pMsg',step<pick.length?`✔ OK. Siguiente: ${pick[step].lot.loc}`:'✔ Recorrida completa. Separá por pedido:',1);drawPick();
+ if(step>=pick.length){DB.kpi.unshift({arm,rem:wave.join(','),ren:pick.length,min:((Date.now()-t0)/60000).toFixed(1),errs});save();$('dSplit').classList.remove('hide');$('dSplitBody').innerHTML=wave.map(r=>`<p><b>${r} – ${REM[r].cli}</b></p><ul>`+REM[r].l.map(([ean,q])=>`<li>${q} × ${P(ean).desc}</li>`).join('')+'</ul>').join('')}};
+// ---------- Muestras ----------
+$('mScan').onkeydown=e=>{if(e.key!=='Enter')return;const s=parseScan(e.target.value);e.target.value='';
+ if(!$('mResp').value.trim())return msg('mMsg','Indicá el responsable antes de retirar.',0);
+ const l=DB.stock.filter(x=>x.ean===s.ean&&x.t==='muestra'&&x.q>0).sort((a,b)=>a.vto.localeCompare(b.vto))[0];
+ if(!l)return msg('mMsg','No hay stock de muestra para ese código.',0);l.q--;
+ DB.log.unshift({f:new Date().toLocaleString('es-AR'),tipo:'Retiro muestra',desc:P(s.ean).desc,lote:l.lote,q:1,quien:$('mResp').value,dest:$('mDest').value});save();
+ msg('mMsg',`✔ Retirada 1 muestra de ${P(s.ean).desc} (${l.loc}) por ${$('mResp').value}`,1);render()};
+// ---------- Render ----------
+function render(){const row=x=>`<tr><td><span class="loc">${x.loc}</span></td><td>${P(x.ean).desc} ${x.t==='muestra'?'<span class="tag">muestra</span>':''}</td><td>${x.lote}</td><td>${fmt(x.vto)}</td><td>${x.q}</td></tr>`,
+ hd='<tr><th>Ubicación</th><th>Producto</th><th>Lote</th><th>Vto</th><th>Cant.</th></tr>',srt=(a,b)=>a.ean.localeCompare(b.ean)||a.vto.localeCompare(b.vto);
+ const lim=new Date(Date.now()+90*864e5).toISOString().slice(0,10);
+ $('vTab').innerHTML='<tr><th>Ubicación</th><th>Producto</th><th>Lote</th><th>Vence</th><th>Cant.</th><th></th></tr>'+(DB.stock.map((x,i)=>[x,i]).filter(([x])=>x.q>0&&x.t==='venta'&&x.vto<=lim).map(([x,i])=>
+  `<tr><td><span class="loc">${x.loc}</span></td><td>${P(x.ean).desc}</td><td>${x.lote}</td><td style="color:var(--warn)"><b>${fmt(x.vto)}</b></td><td>${x.q}</td><td><button class="b s" style="margin:0" onclick="transfer(${i},'muestra')">Derivar a muestras</button></td></tr>`).join('')||'<tr><td colspan=6>Sin alertas</td></tr>');
+ $('kTab').innerHTML='<tr><th>Armador</th><th>Remitos</th><th>Paradas</th><th>Minutos</th><th>Errores</th></tr>'+(DB.kpi.map(k=>`<tr><td>${k.arm}</td><td>${k.rem}</td><td>${k.ren}</td><td>${k.min}</td><td>${k.errs}</td></tr>`).join('')||'<tr><td colspan=5>Sin recorridas aún</td></tr>');
+ $('sTab').innerHTML=hd+DB.stock.filter(x=>x.q>0).sort(srt).map(row).join('');
+ $('mStk').innerHTML=hd.replace('</tr>','<th></th></tr>')+DB.stock.map((x,i)=>[x,i]).filter(([x])=>x.t==='muestra'&&x.q>0).map(([x,i])=>row(x).replace('</tr>',`<td><button class="b s" style="margin:0" onclick="transfer(${i},'venta')">Volver a venta</button></td></tr>`)).join('');
+ $('mLog').innerHTML='<tr><th>Fecha</th><th>Tipo</th><th>Producto</th><th>Lote</th><th>Cant.</th><th>Responsable</th><th>Destino</th></tr>'+
+  DB.log.filter(l=>/muestra|interno/i.test(l.tipo)).map(l=>`<tr><td>${l.f}</td><td>${l.tipo}</td><td>${l.desc}</td><td>${l.lote}</td><td>${l.q}</td><td>${l.quien}</td><td>${l.dest}</td></tr>`).join('');
+ let h='';for(const a of AISLES){h+=`<div class="aisle"><h3>${a==='M'?'M · Muestras':'Pasillo '+a}</h3>`;
+  for(let s=1;s<=SHELVES;s++)for(let n=1;n<=LEVELS;n++){const loc=`${a}-0${s}-${n}`,ps=[...new Set(DB.stock.filter(x=>x.loc===loc&&x.q>0).map(x=>P(x.ean).desc))],
+   fx=PROD.filter(p=>p.loc===loc).map(p=>p.desc),names=[...new Set([...fx,...ps])],ri=lastRoute.indexOf(loc);
+   h+=`<div class="slot ${ri>=0?'hit':''} ${a==='M'?'m':''}"><b>${loc}</b>${ri>=0?`<i>${ri+1}</i>`:''}<br>${names.join('<br>')}</div>`}h+='</div>'}$('map').innerHTML=h}
+function transfer(i,to){const x=DB.stock[i];const q=+prompt(`Cantidad a pasar a ${to} (máx ${x.q}):`,x.q);if(!(q>0&&q<=x.q))return;
+ const p=P(x.ean),loc=to==='muestra'?(DB.stock.find(y=>y.ean===x.ean&&y.t==='muestra')||{loc:'M-0'+(1+PROD.indexOf(p)%SHELVES)+'-1'}).loc:p.loc,ri='RI-'+String(++DB.ri).padStart(4,'0');
+ x.q-=q;const ex=DB.stock.find(y=>y.ean===x.ean&&y.lote===x.lote&&y.loc===loc);ex?ex.q+=q:DB.stock.push({...x,loc,q,t:to});
+ DB.log.unshift({f:new Date().toLocaleString('es-AR'),tipo:`Remito interno ${ri} → ${to==='muestra'?'muestra':'venta'}`,desc:p.desc,lote:x.lote,q,quien:'-',dest:loc});save();render();alert(`${ri} generado: ${q} × ${p.desc} → ${loc}`)}
+$('reset').onclick=()=>{DB=seed();save();render()};render();
+</script>
+</body>
+</html>
