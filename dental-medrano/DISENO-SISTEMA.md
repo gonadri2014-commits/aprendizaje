@@ -5,7 +5,7 @@
 RECEPCIÓN ─► escanear contra OC ─► EAN + lote + vto ─► sistema indica ubicación ─► escanear ubicación ─► stock OK
 REMITO ────► sistema asigna lote por FEFO ─► imprime remito con QR
 ARMADO ────► armador escanea su credencial ─► escanea remito(s) ─► recorrida ordenada (pasillo/estante/nivel)
-            ─► escanea producto en cada parada ─► valida tamaño y lote (otro lote = rechazo o justificación)
+            ─► escanea producto en cada parada ─► valida tamaño y lote (otro lote = NO PASA) ─► confirmar despacho
 MUESTRAS ──► depósito propio "M" ─► entra/sale solo con remito interno ─► retiro con responsable
 ```
 
@@ -13,7 +13,7 @@ MUESTRAS ──► depósito propio "M" ─► entra/sale solo con remito intern
 | Tema | Regla |
 |---|---|
 | Lote | Lo asigna **el sistema al generar el remito, por FEFO**. No depende de quien factura. |
-| Validación | En el picking se escanea el producto: tamaño distinto = bloqueo; lote distinto = rechazo o **justificación registrada**. |
+| Validación | En el picking se escanea el producto: tamaño distinto = bloqueo; lote distinto = **NO PASA** (hay que armar de nuevo). Sin 100% validado no se confirma el despacho. |
 | Ruta | Ítems ordenados por ubicación (pasillo → estante → nivel, en serpentina), no por orden de carga. |
 | Oleada | Se pueden escanear varios remitos y armar en **una sola recorrida**; después se separa por pedido. |
 | Usuarios | 1 lector inalámbrico/terminal por armador; se identifica con su **credencial** al iniciar. Queda quién armó, cuánto tardó y errores. |
@@ -37,4 +37,6 @@ Productos · Ubicaciones · Stock por lote (depósito venta/muestra) · Remitos 
 Errores de armado %, pedidos/hora por armador, tiempo por pedido, stock por vencer (90 d), diferencias en conteo cíclico, muestras por vendedor.
 
 ## Prototipo
+Ver también `PROCEDIMIENTO.md` (rutina diaria, roles y controles).
+
 `prototipo.html` – abrir en el navegador. El lector de código de barras funciona como teclado + Enter. Datos de ejemplo.
