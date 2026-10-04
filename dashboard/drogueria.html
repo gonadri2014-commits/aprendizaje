@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finanzas Droguería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EAEEF2; --sheet:#FFFFFF; --ink:#172A3A; --muted:#5B6B7A; --line:#D3DAE1;
+  --mint:#1E8C74; --mint-soft:#CFE8E1; --amber:#D99A1E; --red:#C23B3B; --foil:#B9C3CC;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1A24; --sheet:#16242F; --ink:#E6EDF2; --muted:#93A3B1; --line:#2A3B49;
+    --mint:#3DB898; --mint-soft:#1D3E39; --amber:#E7AE3A; --red:#E06464; --foil:#3A4D5C;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;
+  font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 16px 48px}
+header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;
+  border-bottom:2px solid var(--ink);padding-bottom:12px}
+.brand{font-stretch:125%;font-weight:800;font-size:22px;letter-spacing:-.01em}
+.brand small{display:block;font-stretch:100%;font-weight:400;font-size:14px;color:var(--muted);letter-spacing:0}
+.live{font-size:14px;color:var(--muted)}
+.live b{color:var(--mint);font-weight:600}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mint);margin-right:6px;vertical-align:1px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
+@media (prefers-reduced-motion: reduce){.dot{animation:none}}
+
+h2{font-stretch:112%;font-weight:700;font-size:18px;margin:0 0 2px;letter-spacing:-.005em}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px;max-width:68ch}
+
+/* Hero: caja proyectada */
+.hero{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(260px,1fr);gap:32px;padding:28px 0 32px}
+.hero h1{font-stretch:125%;font-weight:800;font-size:clamp(26px,3.4vw,40px);line-height:1.08;margin:0 0 6px;letter-spacing:-.02em;max-width:22ch}
+.hero .sub{margin-bottom:12px}
+#cash svg{width:100%;height:auto;display:block}
+.decide{background:var(--ink);color:var(--paper);border-radius:14px;padding:22px 22px 18px;align-self:start}
+.decide h2{color:var(--paper)}
+.decide ul{list-style:none;margin:12px 0 0;padding:0}
+.decide li{padding:12px 0;border-top:1px solid color-mix(in srgb,var(--paper) 20%,transparent)}
+.decide li strong{display:block;font-weight:600}
+.decide li span{font-size:14px;opacity:.75}
+.decide button{margin-top:10px;font:inherit;font-weight:600;font-size:14px;background:var(--mint);color:#fff;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
+.decide button:focus-visible, .seg button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* Grid inferior */
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px}
+.panel{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:20px}
+.span7{grid-column:span 7}.span5{grid-column:span 5}.span12{grid-column:span 12}
+
+/* Budget vs real */
+.bvr{display:grid;grid-template-columns:150px 1fr 78px;gap:4px 14px;align-items:center;font-size:14px}
+.bvr .track{position:relative;height:30px;background:var(--paper);border-radius:4px}
+.bvr .bar{position:absolute;inset:5px auto 5px 0;border-radius:3px;background:var(--ink)}
+.bvr .tgt{position:absolute;top:0;bottom:0;width:2px;background:var(--amber)}
+.bvr .v{text-align:right;font-weight:600}
+.bvr .n{font-size:13px;color:var(--muted)}
+.bvr .n + .n{margin-bottom:14px}
+.bvr .tot{border-top:1px solid var(--line);padding-top:12px;font-weight:600}
+.bvr .v.neg{color:var(--red)}.bvr .v.pos{color:var(--mint)}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin-top:14px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* Blister de vencimientos */
+.blister{display:grid;grid-template-columns:repeat(12,1fr);gap:7px;padding:14px;background:var(--foil);border-radius:16px}
+.pill{aspect-ratio:1/1.5;border-radius:999px;border:0;padding:0;cursor:pointer;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.18), inset 0 3px 0 rgba(255,255,255,.35)}
+.pill.ok{background:var(--sheet)}
+.pill.warn{background:var(--amber)}
+.pill.crit{background:var(--red)}
+.pill.sel{outline:3px solid var(--ink);outline-offset:2px}
+.pill:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.lot{margin-top:14px;min-height:64px;font-size:14px;border-left:3px solid var(--line);padding-left:12px}
+.lot strong{font-size:15px}
+
+/* Cobranzas */
+.aging{display:grid;grid-template-columns:110px 1fr 70px;gap:8px 12px;align-items:center;font-size:14px}
+.stack{display:flex;height:18px;border-radius:4px;overflow:hidden;background:var(--paper)}
+.stack span{height:100%}
+.aging .v{text-align:right;font-weight:600}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.seg button{font:inherit;font-size:13px;background:transparent;color:var(--muted);border:0;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+
+footer{color:var(--muted);font-size:13px;margin-top:28px}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .span7,.span5{grid-column:span 12}
+  .bvr{grid-template-columns:1fr 64px}
+  .bvr > div:nth-child(6n+1){grid-column:1 / -1;margin-top:6px}
+  .bvr > div:nth-child(6n+4),.bvr > div:nth-child(6n+6){display:none}
+  .blister{grid-template-columns:repeat(8,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Droguería del Plata<small>Tablero de finanzas · octubre 2026</small></div>
+    <div class="live"><span class="dot"></span>Actualizado <b id="clock">hoy</b> desde el ERP y bancos</div>
+  </header>
+
+  <section class="hero">
+    <div id="cash">
+      <h1>La caja toca el mínimo la semana del 9 de noviembre</h1>
+      <p class="sub">Saldo proyectado a 13 semanas, en millones de pesos. Incluye pagos a laboratorios, cobranzas de obras sociales y nómina. Mínimo operativo: $180 M.</p>
+      <svg id="cashChart" viewBox="0 0 760 300" role="img" aria-label="Saldo de caja proyectado a 13 semanas"></svg>
+    </div>
+    <aside class="decide">
+      <h2>Qué hacer esta semana</h2>
+      <ul>
+        <li><strong>Adelantar cobro PAMI de septiembre</strong><span>$142 M liquidables con 3 días de anticipo; cubre el bache de noviembre.</span></li>
+        <li><strong>Negociar 30 días más con Lab. Roemmers</strong><span>Factura de $96 M vence el 6/11, la semana más ajustada.</span></li>
+        <li><strong>Liquidar 14 lotes por vencer</strong><span>$38 M en stock vence antes de 60 días.</span></li>
+      </ul>
+      <button type="button" id="sim">Simular adelanto PAMI</button>
+    </aside>
+  </section>
+
+  <div class="grid">
+    <section class="panel span7">
+      <h2>Ventas reales contra presupuesto</h2>
+      <p class="sub">Acumulado a septiembre por línea de negocio, en millones de pesos.</p>
+      <div class="bvr" id="bvr"></div>
+      <div class="legend"><span><i style="background:var(--ink)"></i>Real</span><span><i style="background:var(--amber);width:3px"></i>Presupuesto</span></div>
+    </section>
+
+    <section class="panel span5">
+      <h2>Stock por vencer</h2>
+      <p class="sub">Cada cápsula es un lote. Tocá uno para ver el detalle.</p>
+      <div class="blister" id="blister" role="group" aria-label="Lotes en stock"></div>
+      <div class="legend"><span><i style="background:var(--red)"></i>Vence en menos de 30 días</span><span><i style="background:var(--amber)"></i>30 a 90 días</span><span><i style="background:var(--sheet);border:1px solid var(--line)"></i>Más de 90 días</span></div>
+      <div class="lot" id="lot" aria-live="polite">Elegí un lote.</div>
+    </section>
+
+    <section class="panel span12">
+      <h2>Cuentas por cobrar a obras sociales</h2>
+      <p class="sub">Antigüedad de la deuda en millones de pesos.</p>
+      <div class="seg" role="group" aria-label="Ordenar">
+        <button type="button" aria-pressed="true" data-sort="total">Mayor saldo</button>
+        <button type="button" aria-pressed="false" data-sort="late">Más atrasadas</button>
+      </div>
+      <div class="aging" id="aging"></div>
+      <div class="legend">
+        <span><i style="background:var(--mint)"></i>0–30 días</span>
+        <span><i style="background:var(--mint-soft)"></i>31–60</span>
+        <span><i style="background:var(--amber)"></i>61–90</span>
+        <span><i style="background:var(--red)"></i>Más de 90</span>
+      </div>
+    </section>
+  </div>
+  <footer>Datos de ejemplo. Conectar a ERP, homebanking y sistema de stock para tiempo real.</footer>
+</div>
+
+<script>
+const fmt = n => '$' + n.toLocaleString('es-AR',{maximumFractionDigits:n<10?1:0}) + ' M';
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// --- Caja proyectada ---
+const weeks = ['5/10','12/10','19/10','26/10','2/11','9/11','16/11','23/11','30/11','7/12','14/12','21/12','28/12'];
+const base  = [412,365,338,301,236,171,214,262,240,298,331,286,352];
+let cash = base.slice();
+const MIN = 180;
+function drawCash(){
+  const svg = document.getElementById('cashChart');
+  const narrow=innerWidth<600, W=narrow?420:760,H=narrow?320:300,l=46,r=16,t=20,b=34, max=450, min=100;
+  const x=i=>l+i*(W-l-r)/(weeks.length-1), y=v=>t+(max-v)*(H-t-b)/(max-min);
+  let g='';
+  [100,200,300,400].forEach(v=>{g+=`<line x1="${l}" x2="${W-r}" y1="${y(v)}" y2="${y(v)}" stroke="${css('--line')}"/>`+
+    `<text x="${l-8}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="${css('--muted')}">${v}</text>`});
+  weeks.forEach((w,i)=>{ if(i%(narrow?3:2)===0) g+=`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="12" fill="${css('--muted')}">${w}</text>`});
+  g+=`<rect x="${l}" y="${y(MIN)}" width="${W-l-r}" height="${y(min)-y(MIN)}" fill="${css('--red')}" opacity=".08"/>`;
+  g+=`<line x1="${l}" x2="${W-r}" y1="${y(MIN)}" y2="${y(MIN)}" stroke="${css('--red')}" stroke-dasharray="5 4" stroke-width="1.5"/>`;
+  g+=`<text x="${W-r}" y="${y(MIN)-6}" text-anchor="end" font-size="12" fill="${css('--red')}">Mínimo operativo</text>`;
+  const pts = cash.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+  g+=`<polygon points="${l},${y(min)} ${pts} ${x(cash.length-1)},${y(min)}" fill="${css('--mint')}" opacity=".12"/>`;
+  if(cash!==base) g+=`<polyline points="${base.map((v,i)=>`${x(i)},${y(v)}`).join(' ')}" fill="none" stroke="${css('--muted')}" stroke-width="1.5" stroke-dasharray="3 4"/>`;
+  g+=`<polyline points="${pts}" fill="none" stroke="${css('--ink')}" stroke-width="3" stroke-linejoin="round"/>`;
+  const lo = cash.indexOf(Math.min(...cash));
+  cash.forEach((v,i)=>{ const bad=v<MIN+5;
+    g+=`<circle cx="${x(i)}" cy="${y(v)}" r="${i===lo?7:3.5}" fill="${bad?css('--red'):css('--ink')}" stroke="${css('--paper')}" stroke-width="2"><title>Semana ${weeks[i]}: ${fmt(v)}</title></circle>`});
+  g+=`<text x="${x(lo)}" y="${y(cash[lo])+26}" text-anchor="middle" font-size="13" font-weight="700" fill="${cash[lo]<MIN+5?css('--red'):css('--ink')}">${fmt(cash[lo])}</text>`;
+  g+=`<text x="${x(0)+4}" y="${y(cash[0])-12}" font-size="13" font-weight="700" fill="${css('--ink')}">Hoy ${fmt(cash[0])}</text>`;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=g;
+}
+document.getElementById('sim').addEventListener('click',e=>{
+  const on = cash===base;
+  cash = on ? base.map((v,i)=> i>=1 ? v+ (i<6?142:142-40) : v) : base;
+  e.target.textContent = on ? 'Quitar simulación' : 'Simular adelanto PAMI';
+  document.querySelector('#cash h1').textContent = on
+    ? `Con el adelanto PAMI, la caja nunca baja de ${fmt(Math.min(...cash))}`
+    : 'La caja toca el mínimo la semana del 9 de noviembre';
+  drawCash();
+});
+
+// --- Budget vs real ---
+const lines=[['Medicamentos éticos',2840,2710],['Venta libre (OTC)',920,1004],['Perfumería',410,455],['Descartables',360,331],['Oncológicos',1180,1066]];
+const bmax=Math.max(...lines.flatMap(d=>[d[1],d[2]]))*1.05;
+document.getElementById('bvr').innerHTML=lines.map(([n,real,pres])=>{
+  const d=(real/pres-1)*100;
+  return `<div>${n}</div><div class="track" title="Real ${fmt(real)} · Presupuesto ${fmt(pres)}"><div class="bar" style="width:${real/bmax*100}%"></div><div class="tgt" style="left:${pres/bmax*100}%"></div></div><div class="v ${d<0?'neg':'pos'}">${d>0?'+':''}${d.toFixed(1)}%</div><div></div><div class="n">Real ${fmt(real)} · Presupuesto ${fmt(pres)}</div><div class="n"></div>`}).join('')
+  + (()=>{const R=lines.reduce((s,d)=>s+d[1],0),P=lines.reduce((s,d)=>s+d[2],0),d=(R/P-1)*100;
+    return `<div class="tot">Total</div><div class="tot">${fmt(R)} contra ${fmt(P)} presupuestado</div><div class="tot v ${d<0?'neg':'pos'}">${d>0?'+':''}${d.toFixed(1)}%</div>`})();
+
+// --- Blister ---
+const prods=['Amoxicilina 500','Ibuprofeno 400','Losartán 50','Omeprazol 20','Metformina 850','Atorvastatina 20','Enalapril 10','Paracetamol 1g','Clonazepam 2','Levotiroxina 100','Insulina NPH','Salbutamol inh.'];
+let seed=7; const rnd=()=> (seed=(seed*9301+49297)%233280)/233280;
+const lots=Array.from({length:48},(_,i)=>{const r=rnd(); const days= r<.09? Math.floor(5+rnd()*24) : r<.3? Math.floor(30+rnd()*60) : Math.floor(91+rnd()*500);
+  return {p:prods[i%12], lote:'L'+(24100+i*37), days, val:Math.round(0.4+rnd()*3.8*10)/10}});
+const bl=document.getElementById('blister');
+lots.forEach((L,i)=>{const b=document.createElement('button');b.type='button';
+  b.className='pill '+(L.days<30?'crit':L.days<=90?'warn':'ok');
+  b.setAttribute('aria-label',`${L.p}, lote ${L.lote}, vence en ${L.days} días`);
+  b.onclick=()=>{bl.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');
+    document.getElementById('lot').innerHTML=`<strong>${L.p}</strong> · lote ${L.lote}<br>Vence en ${L.days} días · valor en stock ${fmt(L.val)}${L.days<30?'<br>Sugerido: devolver al laboratorio o liquidar con descuento.':''}`};
+  bl.appendChild(b)});
+
+// --- Cobranzas ---
+const os=[['PAMI',[142,96,58,41]],['IOMA',[88,61,44,52]],['OSDE',[71,22,6,2]],['Swiss Medical',[49,18,9,3]],['Galeno',[33,15,12,8]],['OSECAC',[27,19,16,21]]];
+const cols=['--mint','--mint-soft','--amber','--red'];
+function drawAging(sort){
+  const data=os.slice().sort((a,b)=> sort==='late' ? (b[1][2]+b[1][3])-(a[1][2]+a[1][3]) : b[1].reduce((s,v)=>s+v)-a[1].reduce((s,v)=>s+v));
+  const amax=Math.max(...os.map(o=>o[1].reduce((s,v)=>s+v)));
+  document.getElementById('aging').innerHTML=data.map(([n,b])=>{const tot=b.reduce((s,v)=>s+v);
+    return `<div>${n}</div><div class="stack" style="width:${tot/amax*100}%">${b.map((v,i)=>`<span style="width:${v/tot*100}%;background:var(${cols[i]})" title="${fmt(v)}"></span>`).join('')}</div><div class="v">${fmt(tot)}</div>`}).join('');
+}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawAging(b.dataset.sort)});
+
+drawCash(); drawAging('total');
+addEventListener('resize',drawCash);
+document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+</script>
+</body>
+</html>
