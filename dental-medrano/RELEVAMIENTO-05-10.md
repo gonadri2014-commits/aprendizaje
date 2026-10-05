@@ -108,3 +108,9 @@ Viernes: pedidos de librería y pagos. Zonas de promotores: AMBA/MDQ/La Plata (N
 **Preguntas que quedaron sin responder**
 - 2, 25, 28-30, 32, 43, 45, 49-54, 56, 59.
 - Prioridad: **49** (procedimientos ISO del área: el remito ya es formulario *Log 06*, hay que ver qué otros existen) y **51** (responsable de Calidad).
+
+## 5. Observaciones del jefe de logística (05/10) y prioridades
+- **No hay reunión semanal ni comunicación entre sectores.** Propuesta: reunión semanal de 30 min (Logística, Facturación, Comex, Producción, Administración) con 3 temas fijos: pedidos/atrasos, ingresos de la semana, problemas abiertos con responsable y fecha.
+- **Códigos de barras**: lo tienen que gestionar **Comex** (pedir GS1-128 con lote y vencimiento a proveedores) y **Producción** (imprimir código en envases propios GDK/Densell). Para EAN oficial de productos propios hace falta adhesión a **GS1 Argentina**. Mientras tanto: etiqueta interna Code128 con el código Itris.
+- **Prioridad**: 1) códigos de barras, 2) orden y ubicaciones. KPIs y tableros quedan para después.
+- **Sistema**: probablemente es **Itris** (Compañía General de Software, itris.software), que publicita integraciones con otras aplicaciones. Confirmar con el proveedor: API/web services, acceso de lectura a la base, exportaciones programadas, y costo.
