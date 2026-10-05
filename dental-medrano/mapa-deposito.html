@@ -1,0 +1,202 @@
+<title>Mapa Depósito Medrano</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=Source+Sans+3:wght@400;600&display=swap">
+<style id="css">
+/* Layout: buscador arriba, plano de pasillos como tira de carteles, luego cada pasillo en alzado (columnas × estantes) por lado */
+:root{
+  --bg:#eceff3;--panel:#ffffff;--ink:#1a2330;--mut:#5b6979;--line:#d3dae3;
+  --steel:#24406c;--steel-soft:#dfe7f3;--kraft:#a8743d;--kraft-soft:#f1e4d3;--hit:#f2b705;--hit-ink:#1a2330;--warn:#b45309;--warn-soft:#fdecd3;
+  --f-disp:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;--f-body:"Source Sans 3",system-ui,-apple-system,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11151b;--panel:#1a2029;--ink:#e5eaf0;--mut:#97a5b5;--line:#2b3542;--steel:#8fb0e3;--steel-soft:#1f2d42;--kraft:#d4a36e;--kraft-soft:#33281c;--hit:#f5c32c;--hit-ink:#11151b;--warn:#f59e0b;--warn-soft:#3a2a12;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151b;--panel:#1a2029;--ink:#e5eaf0;--mut:#97a5b5;--line:#2b3542;--steel:#8fb0e3;--steel-soft:#1f2d42;--kraft:#d4a36e;--kraft-soft:#33281c;--hit:#f5c32c;--hit-ink:#11151b;--warn:#f59e0b;--warn-soft:#3a2a12;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--f-body)}
+#shell>*{min-width:0}
+#shell{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:20px}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:2rem;line-height:1.05}h2{font-size:1.35rem}h3{font-size:1.1rem}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px}
+.sub{color:var(--mut);margin:4px 0 0;max-width:62ch}
+.btn{font:600 .95rem var(--f-body);border:1px solid var(--steel);background:transparent;color:var(--steel);border-radius:6px;padding:8px 14px;cursor:pointer}
+.btn.pri{background:var(--steel);color:var(--panel)}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,.slot:focus-visible,.tile:focus-visible{outline:3px solid var(--hit);outline-offset:2px}
+.btn[disabled]{opacity:.5;cursor:default}
+.search{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px}
+.search label{font:600 .8rem var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+#q{width:100%;font:500 1.3rem var(--f-mono);padding:12px 14px;border:2px solid var(--steel);border-radius:8px;background:var(--bg);color:var(--ink)}
+.results{display:grid;gap:8px}
+.res{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--panel);text-align:left;color:var(--ink);font:inherit}
+.res:hover{border-color:var(--steel)}
+.code{font-family:var(--f-mono);font-weight:500}
+.loc{font:500 1rem var(--f-mono);background:var(--steel);color:var(--panel);padding:3px 8px;border-radius:5px;white-space:nowrap}
+.loc.rng{background:var(--kraft)}
+.say{grid-column:1/-1;font-size:1.05rem}
+.say b{font-family:var(--f-disp);font-size:1.2rem;letter-spacing:.02em}
+.empty{color:var(--mut);padding:6px 2px}
+.plan{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.tile{flex:0 0 auto;width:112px;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:10px;cursor:pointer;display:grid;gap:6px;text-align:left;color:var(--ink);font:inherit}
+.tile.on{border-color:var(--hit);box-shadow:0 0 0 2px var(--hit)}
+.num{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 1.5rem var(--f-disp);color:#fff}
+.fam{font-size:.8rem;color:var(--mut);line-height:1.2;min-height:2.4em}
+.chip{font:600 .7rem var(--f-body);text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:20px;justify-self:start}
+.chip.med{background:var(--warn-soft);color:var(--warn)}
+.chip.ok{background:var(--steel-soft);color:var(--steel)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--mut);font-size:.88rem}
+.aisles{display:grid;gap:16px}
+.aisle{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0}
+.aisle.on{border-color:var(--hit);box-shadow:0 0 0 2px var(--hit)}
+.ahead{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.ahead .meta{color:var(--mut);font-size:.9rem;flex-basis:100%}
+.note{background:var(--warn-soft);color:var(--ink);border-radius:6px;padding:8px 10px;font-size:.9rem}
+.note b{color:var(--warn)}
+.sides{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px}
+.side{min-width:0}
+.side h3{margin-bottom:6px;color:var(--steel)}
+.elev{overflow-x:auto}
+.grid{display:grid;gap:3px;width:max-content}
+.lvl{font:500 .72rem var(--f-mono);color:var(--mut);display:grid;place-items:center;width:22px}
+.colh{font:500 .72rem var(--f-mono);color:var(--mut);text-align:center}
+.slot{width:44px;height:30px;border:1px solid var(--line);border-radius:3px;background:var(--bg);font:500 .72rem var(--f-mono);color:var(--ink);cursor:pointer;padding:0;position:relative}
+.slot.has{background:var(--kraft-soft);border-color:var(--kraft)}
+.slot.repo{border-style:dashed}
+.slot.hit{background:var(--hit);border-color:var(--hit);color:var(--hit-ink);font-weight:700}
+.slot.sel{outline:2px solid var(--steel);outline-offset:1px}
+.edit{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;background:var(--steel-soft);padding:10px;border-radius:8px}
+.edit label{display:grid;gap:2px;font-size:.78rem;color:var(--mut)}
+.edit input,.add input,textarea{font:inherit;font-size:.95rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);width:100%}
+.detail{background:var(--panel);border:2px solid var(--steel);border-radius:10px;padding:14px;display:grid;gap:10px}
+.detail ul{margin:0;padding-left:18px}
+.detail li{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.x{border:0;background:transparent;color:var(--warn);cursor:pointer;font:600 .85rem var(--f-body)}
+.add{display:grid;grid-template-columns:1fr 2fr auto;gap:8px}
+.tools{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px}
+textarea{min-height:110px;font-family:var(--f-mono);font-size:.85rem}
+.bar{position:sticky;bottom:0;background:var(--panel);border:1px solid var(--steel);border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.msg{font-size:.92rem}.msg.err{color:var(--warn)}
+@media (max-width:520px){h1{font-size:1.6rem}.add{grid-template-columns:1fr}.slot{width:38px}}
+@media (prefers-reduced-motion:no-preference){.aisle,.tile{transition:box-shadow .2s,border-color .2s}}
+</style>
+<div id="shell">
+  <header class="top">
+    <div>
+      <h1>Mapa del depósito · Paraguay 3026</h1>
+      <p class="sub">Escribí el código o el nombre del producto y te dice en qué pasillo, lado, columna y estante buscarlo.</p>
+    </div>
+    <button class="btn" id="editBtn" hidden>Editar mapa</button>
+  </header>
+  <section class="search" aria-label="Buscar producto">
+    <label for="q">Código o descripción</label>
+    <input id="q" autocomplete="off" placeholder="ej. 021083 o speedex">
+    <div class="results" id="results"></div>
+  </section>
+  <section class="detail" id="detail" hidden></section>
+  <section aria-label="Plano">
+    <h2>Pasillos</h2>
+    <div class="plan" id="plan"></div>
+    <div class="legend"><span>Lado I / D: izquierda o derecha entrando al pasillo</span><span>Columna 1: la más cercana a la entrada</span><span>Estante 1: el de abajo · R: repositorio arriba</span></div>
+  </section>
+  <section class="tools" id="tools" hidden>
+    <h2>Cargar productos en bloque</h2>
+    <p class="sub">Pegá líneas con <span class="code">código;descripción;ubicación</span>. Ej: <span class="code">021083-00000;Speedex Putty;05-D-03-4</span>. Sirve para volcar la planilla del relevamiento.</p>
+    <textarea id="bulk" aria-label="Líneas a importar"></textarea>
+    <div><button class="btn" id="bulkBtn">Importar líneas</button> <span class="msg" id="bulkMsg"></span></div>
+  </section>
+  <section class="aisles" id="aisles"></section>
+  <div class="bar" id="bar" hidden><span class="msg" id="barMsg"></span><span><button class="btn" id="discardBtn">Descartar</button> <button class="btn pri" id="saveBtn">Guardar para todos</button></span></div>
+</div>
+<script type="application/json" id="state">{"actualizado":"2026-10-05","pasillos":[{"n":1,"color":"#d9a400","familia":"Piedras diamante y fresones (MDT, Easydent)","lados":[{"id":"I","cols":6},{"id":"D","cols":3}],"niveles":7,"repo":true,"medir":false,"nota":"Un frente y medio: confirmar de qué lado está el medio frente. El cartel también dice '37002 al 27212': verificar ese rango."},{"n":2,"color":"#c62828","familia":"Porcelanas Noritake","lados":[{"id":"I","cols":6},{"id":"D","cols":6}],"niveles":7,"repo":true,"medir":false,"nota":""},{"n":3,"color":"#1e5bb8","familia":"Porcelanas Noritake","lados":[{"id":"I","cols":6},{"id":"D","cols":6}],"niveles":7,"repo":true,"medir":false,"nota":""},{"n":4,"color":"#2e9e3e","familia":"Endodoncia (Roeko, Densell, Easydent)","lados":[{"id":"A","cols":6},{"id":"B","cols":6},{"id":"C","cols":6}],"niveles":7,"repo":true,"medir":true,"nota":"Recinto de 6 × 6 m con estantes adentro: contar cuántas estanterías hay (A, B, C…) y cuántas columnas tiene cada una."},{"n":5,"color":"#1e5bb8","familia":"Endodoncia (Roeko, Densell, Easydent)","lados":[{"id":"I","cols":6},{"id":"D","cols":6}],"niveles":7,"repo":true,"medir":false,"nota":""},{"n":6,"color":"#6b7787","familia":"","lados":[{"id":"I","cols":6},{"id":"D","cols":6}],"niveles":7,"repo":true,"medir":true,"nota":"Tiene otras dimensiones: medir largo, columnas por lado, estantes y si hay repositorio. Los valores actuales son provisorios."},{"n":7,"color":"#6b7787","familia":"","lados":[{"id":"I","cols":6},{"id":"D","cols":6}],"niveles":7,"repo":true,"medir":true,"nota":"Tiene otras dimensiones: medir largo, columnas por lado, estantes y si hay repositorio. Los valores actuales son provisorios."},{"n":8,"color":"#6b7787","familia":"","lados":[{"id":"I","cols":6},{"id":"D","cols":6}],"niveles":7,"repo":true,"medir":false,"nota":"Sin ordenar todavía: relevar qué hay."},{"n":9,"color":"#6b7787","familia":"","lados":[{"id":"I","cols":6},{"id":"D","cols":6}],"niveles":7,"repo":true,"medir":false,"nota":"Sin ordenar todavía: relevar qué hay."}],"rangos":[{"desde":3990,"hasta":4635,"pasillo":1,"nota":"Cartel: piedra diamante / fresones"},{"desde":31590,"hasta":33492,"pasillo":1,"nota":"Cartel: piedra diamante / fresones"}],"productos":[]}</script>
+<script id="main">
+(function(){
+const $=id=>document.getElementById(id);
+const SRC={shell:$('shell').outerHTML,css:$('css').textContent,main:$('main').textContent,title:document.title,fonts:document.querySelector('link[rel=stylesheet]').outerHTML};
+const SERVED=$('state').textContent;
+let S=JSON.parse(SERVED),dirty=false,editing=false,sel=null,hits=new Set(),hitAisle=null,art=null,readOnly=false;
+const LADO={I:'izquierdo',D:'derecho'};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const code=(p,l,c,v)=>`${pad(p)}-${l}-${pad(c)}-${v}`;
+const parse=loc=>{const m=String(loc).trim().toUpperCase().match(/^(\d{1,2})-([A-Z])-(\d{1,2})-(\d{1,2}|R)$/);return m?{p:+m[1],l:m[2],c:+m[3],v:m[4]==='R'?'R':+m[4]}:null};
+const norm=loc=>{const x=parse(loc);return x?code(x.p,x.l,x.c,x.v):null};
+const aisle=n=>S.pasillos.find(a=>a.n===n);
+function valid(loc){const x=parse(loc);if(!x)return false;const a=aisle(x.p);if(!a)return false;const s=a.lados.find(s=>s.id===x.l);if(!s||x.c<1||x.c>s.cols)return false;return x.v==='R'?a.repo:x.v>=1&&x.v<=a.niveles}
+function say(loc){const x=parse(loc);if(!x)return esc(loc);const lado=LADO[x.l]?'lado '+LADO[x.l]:'estantería '+x.l;
+ return `<b>Pasillo ${x.p}</b> · ${lado} · columna ${x.c} · ${x.v==='R'?'repositorio (arriba)':'estante '+x.v+' desde abajo'}`}
+const codeNum=q=>{const m=String(q).replace(/^0+/,'').match(/^\d+/);return m?+m[0]:null};
+
+function renderSearch(){const q=$('q').value.trim().toLowerCase();hits=new Set();hitAisle=null;const out=[];
+ if(q){const ps=S.productos.filter(p=>p.cod.toLowerCase().includes(q)||p.cod.replace(/^0+/,'').toLowerCase().startsWith(q.replace(/^0+/,''))||(p.desc||'').toLowerCase().includes(q)).slice(0,8);
+  ps.forEach(p=>{hits.add(p.ubic);out.push(`<button class="res" data-loc="${esc(p.ubic)}"><span class="loc">${esc(p.ubic)}</span><span><span class="code">${esc(p.cod)}</span> · ${esc(p.desc)}</span><span class="say">${say(p.ubic)}</span></button>`)});
+  const n=codeNum(q);if(!ps.length&&n!==null){const r=S.rangos.find(r=>n>=r.desde&&n<=r.hasta);
+   if(r){hitAisle=r.pasillo;out.push(`<div class="res"><span class="loc rng">P${pad(r.pasillo)}</span><span>Por rango de códigos ${r.desde}–${r.hasta}</span><span class="say"><b>Pasillo ${r.pasillo}</b> · ${esc(r.nota)}. Todavía no está cargada la ubicación exacta.</span></div>`)}}
+  if(!out.length)out.push(`<p class="empty">No está cargado en el mapa. ${S.productos.length?'':'Todavía no hay productos cargados: el relevamiento se carga con "Editar mapa".'}</p>`)}
+ else out.push(`<p class="empty">${S.productos.length} productos con ubicación cargada · ${S.rangos.length} rangos de códigos por pasillo.</p>`);
+ $('results').innerHTML=out.join('');renderAisles()}
+
+function renderPlan(){$('plan').innerHTML=S.pasillos.map(a=>`<button class="tile ${hitAisle===a.n||[...hits].some(h=>parse(h)?.p===a.n)?'on':''}" data-go="${a.n}" aria-label="Ir al pasillo ${a.n}">
+ <span class="num" style="background:${esc(a.color)}">${a.n}</span><span class="fam">${esc(a.familia)||'Sin asignar'}</span>
+ <span class="chip ${a.medir?'med':'ok'}">${a.medir?'A medir':a.lados.length+' lados · '+a.niveles+' est.'}</span></button>`).join('')}
+
+function renderAisles(){renderPlan();const by={};S.productos.forEach(p=>(by[p.ubic]=by[p.ubic]||[]).push(p));
+ $('aisles').innerHTML=S.pasillos.map((a,ai)=>{const on=hitAisle===a.n||[...hits].some(h=>parse(h)?.p===a.n);
+  const sides=a.lados.map(s=>{const lv=[...(a.repo?['R']:[]),...Array.from({length:a.niveles},(_,i)=>a.niveles-i)];
+   let g=`<div class="grid" style="grid-template-columns:22px repeat(${s.cols},auto)"><span></span>`+Array.from({length:s.cols},(_,i)=>`<span class="colh">${i+1}</span>`).join('');
+   lv.forEach(v=>{g+=`<span class="lvl">${v}</span>`;for(let c=1;c<=s.cols;c++){const L=code(a.n,s.id,c,v),n=(by[L]||[]).length;
+    g+=`<button class="slot ${n?'has':''} ${v==='R'?'repo':''} ${hits.has(L)?'hit':''} ${sel===L?'sel':''}" data-loc="${L}" aria-label="${L}${n?', '+n+' productos':''}">${n||''}</button>`}});
+   return `<div class="side"><h3>${LADO[s.id]?'Lado '+LADO[s.id]:'Estantería '+esc(s.id)} · ${s.cols} col.</h3><div class="elev">${g}</div></div>`}).join('');
+  const ed=editing?`<div class="edit">
+   <label>Familia<input data-f="familia" data-a="${ai}" value="${esc(a.familia)}"></label>
+   <label>Lados (id:columnas)<input data-f="lados" data-a="${ai}" value="${esc(a.lados.map(s=>s.id+':'+s.cols).join(' '))}"></label>
+   <label>Estantes<input data-f="niveles" data-a="${ai}" type="number" min="1" max="12" value="${a.niveles}"></label>
+   <label>Repositorio arriba<input data-f="repo" data-a="${ai}" type="checkbox" ${a.repo?'checked':''}></label>
+   <label>Falta medir<input data-f="medir" data-a="${ai}" type="checkbox" ${a.medir?'checked':''}></label>
+   <label>Nota<input data-f="nota" data-a="${ai}" value="${esc(a.nota)}"></label></div>`:'';
+  return `<article class="aisle ${on?'on':''}" id="p${a.n}"><div class="ahead"><span class="num" style="background:${esc(a.color)}">${a.n}</span><h2>Pasillo ${a.n}</h2>
+   <span class="chip ${a.medir?'med':'ok'}">${a.medir?'A medir':'Medido'}</span>
+   <span class="meta">${esc(a.familia)||'Sin familia asignada'} · ${a.niveles} estantes${a.repo?' + repositorio':''}</span></div>
+   ${a.nota?`<div class="note">${a.medir?'<b>Medir:</b> ':''}${esc(a.nota)}</div>`:''}${ed}<div class="sides">${sides}</div></article>`}).join('')}
+
+function renderDetail(){const d=$('detail');if(!sel){d.hidden=true;return}d.hidden=false;
+ const ps=S.productos.filter(p=>p.ubic===sel);
+ d.innerHTML=`<div class="ahead"><span class="loc">${sel}</span><span>${say(sel)}</span><button class="btn" id="closeDet" style="margin-left:auto">Cerrar</button></div>
+ ${ps.length?`<ul>${ps.map(p=>`<li><span><span class="code">${esc(p.cod)}</span> · ${esc(p.desc)}</span>${editing?`<button class="x" data-del="${esc(p.cod)}">Quitar</button>`:''}</li>`).join('')}</ul>`:'<p class="empty">Ubicación vacía en el mapa.</p>'}
+ ${editing?`<form class="add" id="addForm"><input id="addCod" placeholder="Código" required aria-label="Código"><input id="addDesc" placeholder="Descripción" aria-label="Descripción"><button class="btn pri">Agregar aquí</button></form>`:''}`}
+
+function mark(){dirty=true;$('bar').hidden=false;$('barMsg').className='msg';$('barMsg').textContent='Hay cambios sin guardar. Hasta guardar, solo los ves vos.';
+ try{sessionStorage.setItem('mapa-draft',JSON.stringify(S))}catch(e){}}
+function select(loc){sel=loc;renderAisles();renderDetail();$('detail').scrollIntoView({behavior:'smooth',block:'nearest'})}
+
+document.addEventListener('click',e=>{const t=e.target.closest('[data-loc],[data-go],[data-del],#closeDet');if(!t)return;
+ if(t.id==='closeDet'){sel=null;renderAisles();renderDetail();return}
+ if(t.dataset.go){$('p'+t.dataset.go).scrollIntoView({behavior:'smooth'});return}
+ if(t.dataset.del){S.productos=S.productos.filter(p=>!(p.cod===t.dataset.del&&p.ubic===sel));mark();renderSearch();renderDetail();return}
+ const loc=t.dataset.loc;if(t.classList.contains('res')){hits=new Set([loc]);select(loc);$('p'+parse(loc).p).scrollIntoView({behavior:'smooth',block:'start'});return}
+ select(loc)});
+document.addEventListener('submit',e=>{if(e.target.id!=='addForm')return;e.preventDefault();const cod=$('addCod').value.trim();if(!cod)return;
+ S.productos=S.productos.filter(p=>p.cod!==cod);S.productos.push({cod,desc:$('addDesc').value.trim(),ubic:sel});mark();renderSearch();renderDetail()});
+document.addEventListener('change',e=>{const f=e.target.dataset.f;if(!f)return;const a=S.pasillos[+e.target.dataset.a];
+ if(f==='lados'){const ls=e.target.value.trim().toUpperCase().split(/\s+/).map(x=>x.split(':')).filter(x=>/^[A-Z]$/.test(x[0])&&+x[1]>0).map(x=>({id:x[0],cols:Math.min(30,+x[1])}));if(ls.length)a.lados=ls}
+ else if(f==='niveles')a.niveles=Math.max(1,Math.min(12,+e.target.value||7));
+ else if(f==='repo'||f==='medir')a[f]=e.target.checked;else a[f]=e.target.value.trim();
+ const lost=S.productos.filter(p=>!valid(p.ubic)).length;mark();if(lost)$('barMsg').textContent+=` Atención: ${lost} producto(s) quedan en ubicaciones que ya no existen.`;renderSearch()});
+$('q').addEventListener('input',renderSearch);
+$('bulkBtn').onclick=()=>{let ok=0;const bad=[];$('bulk').value.split(/\n/).map(l=>l.trim()).filter(Boolean).forEach((l,i)=>{const [cod,desc,ub]=l.split(/[;\t]/).map(s=>(s||'').trim());const u=norm(ub);
+  if(!cod||!u||!valid(u)){bad.push(i+1);return}S.productos=S.productos.filter(p=>p.cod!==cod);S.productos.push({cod,desc,ubic:u});ok++});
+ $('bulkMsg').className='msg'+(bad.length?' err':'');$('bulkMsg').textContent=`${ok} importados.`+(bad.length?` Revisar líneas ${bad.join(', ')} (código o ubicación inválida).`:'');if(ok){$('bulk').value='';mark();renderSearch()}};
+$('editBtn').onclick=()=>{editing=!editing;$('editBtn').textContent=editing?'Terminar edición':'Editar mapa';$('tools').hidden=!editing;renderAisles();renderDetail()};
+$('discardBtn').onclick=()=>{S=JSON.parse(SERVED);dirty=false;$('bar').hidden=true;try{sessionStorage.removeItem('mapa-draft')}catch(e){}renderSearch();renderDetail()};
+function build(){S.actualizado=new Date().toISOString().slice(0,10);const json=JSON.stringify(S).replace(/</g,'\\u003c');
+ return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif;background:#fafafa}img{max-width:100%}[hidden]{display:none!important}</style></head><body>'
+ +'<title>'+esc(SRC.title)+'</title>\n'+SRC.fonts+'\n<style id="css">'+SRC.css+'</style>\n'+SRC.shell+'\n<script type="application/json" id="state">'+json+'<\/script>\n<script id="main">'+SRC.main+'<\/script></body></html>'}
+$('saveBtn').onclick=async()=>{if(!art)return;$('saveBtn').disabled=true;$('barMsg').textContent='Guardando…';
+ try{await art.publish(build());try{sessionStorage.removeItem('mapa-draft')}catch(e){}}
+ catch(err){$('saveBtn').disabled=false;const c=err&&err.code;$('barMsg').className='msg err';
+  if(c==='conflict')$('barMsg').textContent='Alguien guardó otra versión antes. Se recarga el mapa; tus cambios quedan para recuperar.';
+  else if(c==='not_writer'||c==='not_granted'||c==='not_declared'||c==='consent_required'){readOnly=true;$('barMsg').textContent='Tenés acceso de solo lectura: no podés guardar cambios en este mapa.';$('saveBtn').hidden=true}
+  else if(c==='rate_limited')$('barMsg').textContent='Demasiados guardados seguidos. Esperá un minuto y volvé a guardar.';
+  else $('barMsg').textContent='No se pudo guardar ('+(c||'error')+'). Probá de nuevo en un momento.'}};
+// Recuperar borrador de una sesión anterior
+try{const d=sessionStorage.getItem('mapa-draft');if(d&&d!==SERVED){S=JSON.parse(d);dirty=true;$('bar').hidden=false;$('barMsg').textContent='Recuperé cambios sin guardar de antes. Guardalos o descartalos.'}}catch(e){}
+renderSearch();
+if(window.claude&&claude.use)claude.use('artifact').then(a=>{art=a;if(a)$('editBtn').hidden=false}).catch(()=>{});
+})();
+</script>
