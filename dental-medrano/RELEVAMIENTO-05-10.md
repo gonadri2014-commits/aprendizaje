@@ -70,11 +70,11 @@ Viernes: pedidos de librería y pagos. Zonas de promotores: AMBA/MDQ/La Plata (N
    - Pasillo 4 (recinto 6×6): sus estantes internos como columnas.
    - Depósito de importaciones: zonas de piso marcadas con cinta (`IMP-A1`, `IMP-A2`…) y etiqueta por pallet.
    - Al bajar del repositorio a la ubicación de picking se registra una **reposición**.
+8. **Muestras** pasa a ser solo un estanco "Licitaciones/Donaciones". El foco son **pedidos, ubicaciones y lotes**.
+9. **COT:** confirmar con Laura/contadora si aplica a los repartos dentro de Provincia de Buenos Aires (zonas Norte/Oeste/Sur, La Plata). Puede ser un riesgo fiscal hoy.
 10. **Tipos de pedido con prioridad automática.** Orden de armado: **CC/urgente de locales → vencen 72 h → expresos (17 h) → zona de mañana → "stock" de locales**. Donación y sucursal: lote solo lo cambia Laura. Dueños y producción: siempre con comprobante interno.
 11. **Depósito externo = costo variable.** Indicadores: bultos en el externo, costo mensual y **cobertura en días** del depósito principal. La revisión semanal genera la **lista de reposición** (qué traer en los próximos 8-10 pallets) priorizando lo que se queda sin stock en la vitrina de ventas y lo que más cuesta tener afuera.
 12. **Control final = control de bultos escaneado.** Etiqueta por bulto (pedido + nº 1/3), escaneo de cada bulto al controlar y registro de **quién retira** (chofer, expreso, cliente). Cierra la trazabilidad lote → pedido → bulto → quien retiró.
-8. **Muestras** pasa a ser solo un estanco "Licitaciones/Donaciones". El foco son **pedidos, ubicaciones y lotes**.
-9. **COT:** confirmar con Laura/contadora si aplica a los repartos dentro de Provincia de Buenos Aires (zonas Norte/Oeste/Sur, La Plata). Puede ser un riesgo fiscal hoy.
 
 ## 3. Plan revisado
 
