@@ -101,3 +101,24 @@ Ver borrador de mail abajo. Pedir respuesta por cada punto: **"lo tiene (cómo s
 > 8. Uso de las herramientas de workflow/eventos de Itris para estos circuitos: ¿lo configuran ustedes o lo podemos hacer nosotros?
 >
 > Si es más simple, coordinamos una reunión con alguien de implementación. Gracias.
+
+---
+
+## Reglas de lote por tipo de pedido (propuesta 09/10/2026)
+Al cargar el pedido se elige el **tipo**; el sistema propone la **regla** y el **vencimiento mínimo**. Cambiar la regla exige **motivo** (queda registrado). El pedido se imprime **ordenado por código** para el control manual.
+
+| Tipo de pedido | Regla sugerida | Vto. mínimo (propuesta) |
+|---|---|---|
+| Cliente (venta normal) | FEFO | 6 meses |
+| Sucursal / local propio | FEFO | 3 meses |
+| Licitación | FEFO con mínimo alto (o "vencimiento más largo" si el pliego lo exige) | 12 meses o lo que pida el pliego |
+| Donación | Vencimiento más corto | 1 mes |
+| Exportación | FEFO | 12 meses |
+| Producción (consumo interno) | FEFO | — |
+| Dueños | FEFO | — |
+| Excepción | Lote elegido a mano | Motivo + autorización según matriz |
+
+Reglas fijas: nunca lote vencido, en cuarentena o bloqueado; si un lote no alcanza se completa con el siguiente por la misma regla; si no hay stock que cumpla, el pedido no se imprime y avisa.
+Los meses mínimos los definen Comercial y Calidad. Demo: `reglas-lote.html`.
+
+**Para Itris**: preguntar si el pedido admite un campo "tipo de pedido" que defina el criterio de asignación de lote (FEFO / vencimiento más largo / vencimiento más corto / manual) y un vencimiento mínimo, y si el pedido se puede imprimir ordenado por código.

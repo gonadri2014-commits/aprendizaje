@@ -1,0 +1,143 @@
+<title>Reglas de Lote Medrano</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: arriba la carga del pedido (tipo → regla), al medio el resultado ordenado por código, abajo la tabla de reglas y el stock de prueba */
+:root{
+  --bg:#eceff3;--panel:#ffffff;--ink:#1a2330;--mut:#5b6979;--line:#d3dae3;
+  --steel:#24406c;--steel-soft:#dfe7f3;--kraft:#a8743d;--kraft-soft:#f1e4d3;
+  --ok:#1f7a3d;--ok-soft:#dcf0e2;--bad:#b42318;--bad-soft:#fde3e0;--hit:#f2b705;
+  --f-disp:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;--f-body:"Source Sans 3",system-ui,-apple-system,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11151b;--panel:#1a2029;--ink:#e5eaf0;--mut:#97a5b5;--line:#2b3542;--steel:#8fb0e3;--steel-soft:#1f2d42;--kraft:#d4a36e;--kraft-soft:#33281c;--ok:#5cc77f;--ok-soft:#15301f;--bad:#ff8a7a;--bad-soft:#3a1714;--hit:#f5c32c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151b;--panel:#1a2029;--ink:#e5eaf0;--mut:#97a5b5;--line:#2b3542;--steel:#8fb0e3;--steel-soft:#1f2d42;--kraft:#d4a36e;--kraft-soft:#33281c;--ok:#5cc77f;--ok-soft:#15301f;--bad:#ff8a7a;--bad-soft:#3a1714;--hit:#f5c32c;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 var(--f-body)}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:20px}
+.wrap>*{min-width:0}
+h1,h2,h3{font-family:var(--f-disp);font-weight:700;margin:0;text-wrap:balance}
+h1{font-size:2rem;line-height:1.05}h2{font-size:1.3rem}
+.sub{color:var(--mut);margin:4px 0 0;max-width:68ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.form label{display:grid;gap:4px;font:600 .78rem var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--mut)}
+select,input{font:500 1rem var(--f-body);padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;text-transform:none;letter-spacing:0}
+input.num{font-family:var(--f-mono);width:6em}
+select:focus-visible,input:focus-visible,.btn:focus-visible{outline:3px solid var(--hit);outline-offset:2px}
+.rule{background:var(--steel-soft);color:var(--ink);border-radius:8px;padding:10px 12px}
+.rule b{color:var(--steel)}
+.msg{padding:10px 12px;border-radius:8px;font-weight:600}
+.msg.bad{background:var(--bad-soft);color:var(--bad)}.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{text-align:left;font:600 .75rem var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--mut);padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n{font-variant-numeric:tabular-nums;text-align:right}
+.code{font-family:var(--f-mono);font-size:.9rem}
+.chip{font:600 .72rem var(--f-body);text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}.chip.bad{background:var(--bad-soft);color:var(--bad)}.chip.ex{background:var(--kraft-soft);color:var(--kraft)}
+tr.split td:first-child,tr.split td:nth-child(2){color:transparent}
+.btn{font:600 .9rem var(--f-body);border:1px solid var(--steel);background:transparent;color:var(--steel);border-radius:6px;padding:6px 12px;cursor:pointer}
+.qr{font:500 .82rem var(--f-mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-wrap:anywhere}
+.note{font-size:.88rem;color:var(--mut)}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Reglas de lote por tipo de pedido</h1>
+    <p class="sub">Al cargar el pedido se elige el tipo. El sistema propone la regla de lote y asigna los lotes; si alguien cambia la regla, tiene que indicar el motivo. El pedido sale ordenado por código para el control manual.</p>
+  </header>
+
+  <section class="card" aria-label="Cargar pedido">
+    <h2>1. Cargar pedido</h2>
+    <div class="form">
+      <label for="tipo">Tipo de pedido<select id="tipo"></select></label>
+      <label for="regla">Regla de lote<select id="regla"></select></label>
+      <label for="minm" id="minWrap">Vencimiento mínimo (meses)<input id="minm" type="number" min="0" max="60"></label>
+      <label for="motivo" id="motWrap" hidden>Motivo del cambio de regla<input id="motivo" placeholder="Obligatorio si cambiás la regla sugerida"></label>
+    </div>
+    <div class="rule" id="ruleTxt"></div>
+    <div class="tw"><table><thead><tr><th>Código</th><th>Producto</th><th class="n">Cantidad</th></tr></thead><tbody id="lines"></tbody></table></div>
+    <p class="note">Renglones del remito 0007-00011863, cargados a propósito en desorden: el resultado los ordena por código.</p>
+  </section>
+
+  <section class="card" aria-label="Resultado">
+    <h2>2. Pedido con lotes asignados · ordenado por código</h2>
+    <div id="alert"></div>
+    <div class="tw"><table><thead><tr><th>Código</th><th>Producto</th><th>Lote</th><th>Vence</th><th class="n">Meses</th><th class="n">Cantidad</th><th>Control</th></tr></thead><tbody id="out"></tbody></table></div>
+    <h3>Texto del QR de la hoja</h3>
+    <div class="qr" id="qr"></div>
+  </section>
+
+  <section class="card" aria-label="Reglas">
+    <h2>Reglas</h2>
+    <div class="tw"><table><thead><tr><th>Tipo de pedido</th><th>Regla sugerida</th><th>Vto. mínimo</th><th>Por qué</th></tr></thead><tbody id="rules"></tbody></table></div>
+    <p class="note">Nunca se asigna un lote vencido, en cuarentena o bloqueado. Si un lote no alcanza, se completa con el siguiente según la misma regla. Los meses mínimos son propuestas: los define Comercial y Calidad.</p>
+  </section>
+
+  <section class="card" aria-label="Stock de prueba">
+    <h2>Stock por lote usado en la prueba</h2>
+    <div class="tw"><table><thead><tr><th>Código</th><th>Lote</th><th>Vence</th><th class="n">Disponible</th><th>Origen</th></tr></thead><tbody id="stock"></tbody></table></div>
+    <p class="note">"Remito" son lotes reales del remito 0007-00011863. "Ejemplo" son lotes inventados para mostrar cómo elige cada regla.</p>
+  </section>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const HOY=new Date('2026-10-09');
+const DESC={'021081-00000':'SPEEDEX COMBO Putty + Light + Activador','021083-00000':'SPEEDEX PUTTY Silicona masa 1480 g','021084-00000':'SPEEDEX LIGHT Coltene liviana 140 ml','021085-00000':'SPEEDEX ACTIVADOR Coltene universal 60 ml'};
+const LINES=[['021085-00000',60],['021083-00000',60],['021084-00000',60]];
+const STOCK=[
+ ['021083-00000','P02849','2030-07-02',80,'Remito'],['021083-00000','P01990','2027-01-15',40,'Ejemplo'],['021083-00000','P02310','2028-03-10',50,'Ejemplo'],
+ ['021084-00000','N45574','2027-10-08',70,'Remito'],['021084-00000','N44100','2027-01-20',30,'Ejemplo'],['021084-00000','N46020','2028-09-01',70,'Ejemplo'],
+ ['021085-00000','N02103','2027-03-05',90,'Remito'],['021085-00000','N01880','2026-12-01',20,'Ejemplo'],['021085-00000','N02390','2028-02-12',70,'Ejemplo']
+].map(([cod,lote,vto,q,o])=>({cod,lote,vto,q,o}));
+const REGLAS={
+ FEFO:{n:'FEFO: vence primero, sale primero',d:'Toma el lote que vence antes entre los que cumplen el mínimo. Rota el stock y evita vencidos.'},
+ LARGO:{n:'Vencimiento más largo',d:'Toma el lote que vence más tarde. Para pliegos que exigen la máxima vida útil.'},
+ CORTO:{n:'Vencimiento más corto',d:'Toma el lote más próximo a vencer que todavía cumple el mínimo. Aprovecha lo que está por vencer.'},
+ MANUAL:{n:'Lote elegido a mano',d:'Se elige el lote en cada renglón. Requiere motivo y autorización según la matriz.'}
+};
+const TIPOS=[
+ {id:'cliente',n:'Cliente (venta normal)',r:'FEFO',m:6,p:'Rotación normal; el cliente recibe al menos 6 meses de vida útil.'},
+ {id:'local',n:'Sucursal / local propio',r:'FEFO',m:3,p:'Se vende rápido en mostrador; conviene darle lo que vence antes.'},
+ {id:'licitacion',n:'Licitación',r:'FEFO',m:12,p:'El pliego exige vencimiento largo. FEFO con mínimo alto cumple sin gastar los lotes más largos; si el pliego pide "el más largo", cambiar a esa regla.'},
+ {id:'donacion',n:'Donación',r:'CORTO',m:1,p:'Se aprovechan los lotes próximos a vencer, con al menos 1 mes para que lleguen utilizables.'},
+ {id:'exportacion',n:'Exportación',r:'FEFO',m:12,p:'Tránsito y aduana largos: mínimo 12 meses.'},
+ {id:'produccion',n:'Producción (consumo interno)',r:'FEFO',m:0,p:'Uso inmediato.'},
+ {id:'duenos',n:'Pedido de dueños',r:'FEFO',m:0,p:'Mismo criterio que el resto, con comprobante interno.'}
+];
+const meses=v=>{const d=new Date(v);return Math.floor((d-HOY)/(30.44*864e5))};
+const fmt=v=>v.split('-').reverse().join('/');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let manualSel={};
+$('tipo').innerHTML=TIPOS.map(t=>`<option value="${t.id}">${esc(t.n)}</option>`).join('');
+$('regla').innerHTML=Object.entries(REGLAS).map(([k,r])=>`<option value="${k}">${esc(r.n)}</option>`).join('');
+$('rules').innerHTML=TIPOS.map(t=>`<tr><td>${esc(t.n)}</td><td>${esc(REGLAS[t.r].n)}</td><td class="n">${t.m} meses</td><td>${esc(t.p)}</td></tr>`).join('')+`<tr><td>Cualquiera (excepción)</td><td>${REGLAS.MANUAL.n}</td><td class="n">—</td><td>Cuando Comercial necesita un lote puntual. Queda registrado con motivo.</td></tr>`;
+$('stock').innerHTML=[...STOCK].sort((a,b)=>a.cod.localeCompare(b.cod)||a.vto.localeCompare(b.vto)).map(s=>`<tr><td class="code">${s.cod}</td><td class="code">${s.lote}</td><td>${fmt(s.vto)}</td><td class="n">${s.q}</td><td><span class="chip ${s.o==='Remito'?'ok':'ex'}">${s.o}</span></td></tr>`).join('');
+function tipo(){return TIPOS.find(t=>t.id===$('tipo').value)}
+$('tipo').onchange=()=>{const t=tipo();$('regla').value=t.r;$('minm').value=t.m;manualSel={};render()};
+['regla','minm','motivo'].forEach(id=>$(id).addEventListener('input',render));
+function assign(cod,q,regla,min){
+ let lots=STOCK.filter(s=>s.cod===cod&&s.vto>HOY.toISOString().slice(0,10)&&meses(s.vto)>=min);
+ if(regla==='MANUAL'){const l=STOCK.find(s=>s.cod===cod&&s.lote===manualSel[cod]);lots=l?[l]:[]}
+ else lots.sort((a,b)=>regla==='LARGO'?b.vto.localeCompare(a.vto):a.vto.localeCompare(b.vto));
+ const out=[];let rest=q;for(const l of lots){if(!rest)break;const t=Math.min(rest,l.q);out.push({...l,t});rest-=t}
+ return{out,rest}}
+function render(){const t=tipo(),regla=$('regla').value,min=Math.max(0,+$('minm').value||0),changed=regla!==t.r;
+ $('motWrap').hidden=!changed;$('minWrap').hidden=regla==='MANUAL';
+ $('ruleTxt').innerHTML=`<b>${esc(REGLAS[regla].n)}</b>${regla!=='MANUAL'?` · vencimiento mínimo ${min} meses`:''}. ${esc(REGLAS[regla].d)}`;
+ $('lines').innerHTML=LINES.map(([c,q])=>`<tr><td class="code">${c}</td><td>${esc(DESC[c])}${regla==='MANUAL'?`<br><select data-man="${c}" aria-label="Lote para ${c}"><option value="">Elegir lote…</option>${STOCK.filter(s=>s.cod===c).map(s=>`<option value="${s.lote}" ${manualSel[c]===s.lote?'selected':''}>${s.lote} · vence ${fmt(s.vto)} · ${s.q} u.</option>`).join('')}</select>`:''}</td><td class="n">${q}</td></tr>`).join('');
+ const rows=[],warn=[];
+ [...LINES].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([c,q])=>{const r=assign(c,q,regla,min);
+  r.out.forEach((l,i)=>rows.push(`<tr class="${i?'split':''}"><td class="code">${c}</td><td>${esc(DESC[c])}</td><td class="code">${l.lote}</td><td>${fmt(l.vto)}</td><td class="n">${meses(l.vto)}</td><td class="n">${l.t}</td><td>☐</td></tr>`));
+  if(r.rest)warn.push(`${c}: faltan ${r.rest} u. que cumplan la regla${regla==='MANUAL'&&!manualSel[c]?' (elegí el lote)':''}`);
+  r.out.forEach(l=>rows.qr=(rows.qr||[]).concat(`${c}*${l.t}*${l.lote}`))});
+ $('out').innerHTML=rows.join('');
+ const al=[];if(changed&&!$('motivo').value.trim())al.push('Cambiaste la regla sugerida: falta el motivo. Sin motivo no se puede imprimir el pedido.');
+ al.push(...warn);
+ $('alert').innerHTML=al.length?`<div class="msg bad">${al.map(esc).join('<br>')}</div>`:`<div class="msg ok">Listo para imprimir. Regla: ${esc(REGLAS[regla].n)}${changed?' (cambio con motivo: '+esc($('motivo').value.trim())+')':''}.</div>`;
+ $('qr').textContent=al.length?'— se genera cuando no hay alertas —':`DM1 PED:0007-00011863 P:1/1 R:${regla}+`+(rows.qr||[]).join('+')}
+document.addEventListener('change',e=>{if(e.target.dataset.man!==undefined){manualSel[e.target.dataset.man]=e.target.value;render()}});
+$('tipo').value='cliente';$('tipo').onchange();
+})();
+</script>
