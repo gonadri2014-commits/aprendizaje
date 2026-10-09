@@ -62,3 +62,42 @@ Tipos: ajuste de stock · cambio de lote · NC · donación/licitación · excep
 ## Relación con lo ya armado
 - **Armado por QR**: el lote viaja impreso en el pedido. Si el cambio de lote se hace antes de imprimir (Noe), se evita la mayoría de las autorizaciones a Laura.
 - **Mapa del depósito**: sumar los 3 lugares físicos (4° piso / PB / logística) como depósitos con su prefijo de ubicación.
+
+---
+
+## Itris: qué se averiguó (09/10/2026)
+**Confirmado**
+- En la empresa: módulo de stock con lotes, vencimientos y depósitos (respuesta del relevamiento). El remito de expreso ya imprime lote, vencimiento y nº de despacho.
+- Públicamente: Itris es una empresa de software de Buenos Aires, con unos 20 años en el mercado. Tiene ERP, POS e integraciones con e-commerce y Mercado Libre. Un perfil público menciona herramientas propias de **diccionario, eventos, workflow y reportes** (ITRIS DevTools). Es decir: la plataforma se puede personalizar y tiene un motor de workflow.
+
+**Sin confirmar** (no hay documentación pública y el sitio no se pudo consultar)
+- Circuitos de aprobación para ajustes de stock, cambios de lote, NC o donaciones.
+- Transferencias con recepción parcial y saldo pendiente.
+- Permisos por usuario y por operación. Log de auditoría.
+- API o web services.
+
+### Verificar en el sistema (con usuario administrador, ~1 hora)
+1. Menú completo: anotar todos los módulos y opciones habilitadas (sacar captura de cada menú).
+2. Stock → ¿existe "Transferencia entre depósitos"? ¿Permite recibir menos de lo enviado y deja saldo?
+3. Stock → ¿"Ajuste de stock" pide motivo? ¿Queda quién y cuándo?
+4. Usuarios/Perfiles → ¿se puede bloquear "ajuste" o "cambio de lote" a un usuario y permitir solo "solicitar"?
+5. ¿Hay algún estado "pendiente de autorización" en algún comprobante (pedidos, NC, ajustes)?
+6. ¿Existe consulta de auditoría o historial de cambios por comprobante?
+7. Lotes → ¿la asignación es configurable (FIFO / FEFO / manual)? ¿Se puede reservar un lote para un pedido?
+
+### Pedir al proveedor (por escrito)
+Ver borrador de mail abajo. Pedir respuesta por cada punto: **"lo tiene (cómo se configura)" / "se desarrolla (costo y plazo)" / "no se puede"**.
+
+> **Asunto:** Dental Medrano – Consulta de funcionalidades Itris (stock, lotes y autorizaciones)
+>
+> Hola, soy el nuevo Jefe de Logística de Dental Medrano. Estamos ordenando los circuitos de depósito y queremos aprovechar al máximo Itris antes de evaluar desarrollos externos. Les pido que nos indiquen, para cada punto, si ya está disponible (y cómo se configura), si se puede desarrollar (costo y plazo estimado) o si no es posible:
+> 1. Circuito de autorización para ajustes de stock y cambios de lote: un usuario solicita con motivo y otro aprueba según tipo o monto.
+> 2. Transferencias entre depósitos con recepción parcial, saldo pendiente y cierre al completar (producción → depósito y entre 4° piso, PB y logística).
+> 3. Perfiles y permisos por operación (solicitar / aprobar / ejecutar).
+> 4. Log de auditoría de cambios en stock, lotes y comprobantes.
+> 5. Asignación de lote por vencimiento (FEFO), con excepción manual y reserva de lote para un pedido.
+> 6. Impresión de código de barras / QR en pedidos y remitos (con producto, cantidad y lote por renglón).
+> 7. API, web services o acceso de lectura a la base de datos para integrar un sistema de armado con lectores.
+> 8. Uso de las herramientas de workflow/eventos de Itris para estos circuitos: ¿lo configuran ustedes o lo podemos hacer nosotros?
+>
+> Si es más simple, coordinamos una reunión con alguien de implementación. Gracias.
