@@ -38,3 +38,8 @@ Pedido del local → se arma → **se escribe a mano** código + lote en el form
 - ¿Quién completa, quién tipea y quién controla? ¿Cuánto tarda cada paso?
 - ¿Cuántos PC por día y cuántos renglones?
 - ¿La sucursal controla al recibir? ¿Cómo informa diferencias?
+
+## Videos 3, 4 y 5 (baja resolución, parcialmente legibles)
+- **Video 3:** varias hojas del formulario de movimiento de stock con **correcciones en rojo**, círculos, firmas y sello, y un comprobante Dental Medrano 0001-0001186x. El papel se revisa y corrige varias veces antes de cargarlo.
+- **Video 4 (hallazgo importante):** pantalla de Itris de un **movimiento** con campos *Depósito origen* ("DEPÓSITO CASA CENTRAL"), *Chofer*, *Nro. envío mercadería*, *Tipo de asiento* y *Orden de servicio*. El detalle tiene columnas **Tipo (Egreso / Ingreso)**, **Lote** y **Ubicación**. → Itris ya maneja **depósito origen/destino y ubicación** en los movimientos: probablemente se puedan hacer transferencias en lugar de ajustes. Captura: `fotos/itris-movimiento-egreso-ingreso.png`.
+- **Video 5:** otra pantalla de carga con detalle (artículo, descripción, lote, cantidad) y un menú desplegable; no se lee.
