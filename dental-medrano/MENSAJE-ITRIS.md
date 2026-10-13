@@ -6,7 +6,7 @@ Hola, ¿cómo están? Soy [Nombre], Jefe de Logística de Dental Medrano (client
 
 **1. Transferencias de stock con autorización**
 - Transferencias entre depósitos (producción → logística, y entre nuestros depósitos internos) con circuito de **solicitud y aprobación**.
-- **Recepción parcial**: si la transferencia llega incompleta, aprobar solo lo recibido, dejar el saldo pendiente y cerrarla cuando llegue el resto.
+- **Recepción parcial / aceptar con diferencias** (hoy la aceptación de transferencias es total o nada): aceptar solo lo recibido, dejar el saldo pendiente o generar la devolución con motivo, y cerrarla cuando llegue el resto.
 - Que cada transferencia mantenga **lote y vencimiento** por renglón.
 
 **2. Autorizaciones y permisos**
