@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buscador por Lote</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --tx:#1b1f24; --mu:#5b6470; --ok:#0a7d38; --err:#b42318; --bd:#d9dde3; --ac:#1d4ed8; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111418; --card:#1b2027; --tx:#e8ebef; --mu:#9aa4b1; --bd:#2c333d; --ok:#4ade80; --err:#f87171; --ac:#60a5fa; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--tx); padding:16px; }
+  main { max-width:720px; margin:0 auto; }
+  h1 { font-size:1.3rem; margin:0 0 4px; }
+  p.mu { color:var(--mu); margin:0 0 16px; font-size:.9rem; }
+  .card { background:var(--card); border:1px solid var(--bd); border-radius:10px; padding:16px; margin-bottom:12px; }
+  input[type=text] { width:100%; font-size:1.4rem; padding:12px; border:2px solid var(--ac); border-radius:8px; background:var(--card); color:var(--tx); }
+  table { width:100%; border-collapse:collapse; font-size:.95rem; }
+  th,td { text-align:left; padding:6px 4px; border-bottom:1px solid var(--bd); }
+  th { color:var(--mu); font-weight:500; width:38%; }
+  .ok { color:var(--ok); } .err { color:var(--err); }
+  #hist li { font-size:.85rem; color:var(--mu); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Buscador por lote</h1>
+  <p class="mu">1) Cargá el CSV de productos/lotes (formato <code>plantilla_lotes.csv</code>, separador ; o ,). 2) Escaneá: acepta lote solo, EAN o GS1-128/DataMatrix.</p>
+
+  <div class="card">
+    <input type="file" id="archivo" accept=".csv,.txt">
+    <div id="estado" class="mu" style="margin-top:8px">Sin datos cargados.</div>
+  </div>
+
+  <div class="card">
+    <input type="text" id="scan" placeholder="Escanear código o tipear lote…" autocomplete="off" autofocus>
+  </div>
+
+  <div class="card" id="resultado" hidden></div>
+
+  <div class="card"><strong>Últimos escaneos</strong><ul id="hist"></ul></div>
+</main>
+
+<script>
+// ---- Parser GS1 (AI 01 GTIN, 10 Lote, 17 Vencimiento, 21 Serie) ----
+const GS = '\u001d';
+const AI_FIJOS = { '01': 14, '02': 14, '11': 6, '13': 6, '15': 6, '17': 6, '00': 18 };
+const AI_VAR = ['10', '21', '37', '30'];
+
+function parseGS1(raw) {
+  let s = raw.replace(/^\][A-Za-z]\d/, ''); // prefijo de simbología (]C1, ]d2)
+  // Formato legible: (01)...(17)...(10)...
+  if (s.startsWith('(')) {
+    const out = {};
+    for (const m of s.matchAll(/\((\d{2,4})\)([^(]*)/g)) out[m[1]] = m[2];
+    return Object.keys(out).length ? out : null;
+  }
+  if (!/^(01|02|10|17|21)/.test(s) || s.length < 16) return null;
+  const out = {};
+  let i = 0;
+  while (i < s.length) {
+    const ai = s.substr(i, 2); i += 2;
+    if (AI_FIJOS[ai]) { out[ai] = s.substr(i, AI_FIJOS[ai]); i += AI_FIJOS[ai]; }
+    else if (AI_VAR.includes(ai)) {
+      const fin = s.indexOf(GS, i);
+      out[ai] = fin === -1 ? s.slice(i) : s.slice(i, fin);
+      i = fin === -1 ? s.length : fin + 1;
+    } else return Object.keys(out).length ? out : null;
+    if (s[i] === GS) i++;
+  }
+  return out;
+}
+
+// ---- CSV ----
+let filas = [];
+function parseCSV(txt) {
+  const lineas = txt.replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim());
+  const sep = (lineas[0].match(/;/g) || []).length >= (lineas[0].match(/,/g) || []).length ? ';' : ',';
+  const cab = lineas[0].split(sep).map(c => c.trim().toLowerCase());
+  return lineas.slice(1).map(l => {
+    const v = l.split(sep); const o = {};
+    cab.forEach((c, k) => o[c] = (v[k] || '').trim());
+    return o;
+  });
+}
+
+const norm = x => String(x || '').trim().toUpperCase();
+const sinCeros = x => norm(x).replace(/^0+/, '');
+
+function buscar(raw) {
+  const g = parseGS1(raw);
+  let lote = g?.['10'] ? norm(g['10']) : null;
+  const gtin = g?.['01'] ? sinCeros(g['01']) : null;
+  const code = norm(raw);
+  let r = [];
+  if (lote) r = filas.filter(f => norm(f.lote) === lote && (!gtin || sinCeros(f.codigo_barras) === gtin || !f.codigo_barras));
+  if (!r.length) r = filas.filter(f => norm(f.lote) === code);                     // lote solo
+  if (!r.length) r = filas.filter(f => sinCeros(f.codigo_barras) === sinCeros(code) || norm(f.codigo_producto) === code); // EAN o código interno
+  if (!r.length && gtin) r = filas.filter(f => sinCeros(f.codigo_barras) === gtin);
+  return { g, r, lote: lote || code };
+}
+
+function fmtVto(v) { return /^\d{6}$/.test(v) ? `20${v.slice(0,2)}-${v.slice(2,4)}-${v.slice(4,6)}` : v; }
+
+function mostrar(raw) {
+  const { g, r, lote } = buscar(raw);
+  const box = document.getElementById('resultado');
+  box.hidden = false;
+  const gs1 = g ? `<p class="mu">GS1 leído: GTIN ${g['01'] || '-'} · Lote ${g['10'] || '-'} · Vto ${g['17'] ? fmtVto(g['17']) : '-'}</p>` : '';
+  if (!r.length) {
+    box.innerHTML = `<strong class="err">No encontrado: ${esc(lote)}</strong>${gs1}`;
+  } else {
+    box.innerHTML = `<strong class="ok">${r.length} coincidencia(s)</strong>${gs1}` + r.map(f => `
+      <table>${Object.entries(f).map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>`).join('<br>');
+  }
+  const li = document.createElement('li');
+  li.textContent = `${new Date().toLocaleTimeString()} · ${raw.replace(GS, '<GS>')} · ${r.length ? (r[0].descripcion || r[0].codigo_producto) : 'NO ENCONTRADO'}`;
+  document.getElementById('hist').prepend(li);
+}
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+document.getElementById('archivo').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  filas = parseCSV(await f.text());
+  document.getElementById('estado').textContent = `${filas.length} registros cargados de ${f.name}.`;
+  document.getElementById('scan').focus();
+});
+
+const scan = document.getElementById('scan');
+scan.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); if (scan.value.trim()) mostrar(scan.value.trim()); scan.value = ''; }
+});
+
+if (typeof module !== 'undefined') module.exports = { parseGS1 };
+</script>
+</body>
+</html>

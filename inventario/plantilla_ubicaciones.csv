@@ -1,0 +1,3 @@
+codigo_ubicacion;deposito;zona;pasillo;estante;nivel;descripcion;activa
+DEP1-A-01-01-1;DEP1;A;01;01;1;Depósito 1 - Zona A - Pasillo 01 - Estante 01 - Nivel 1;S
+DEP1-A-01-01-2;DEP1;A;01;01;2;Depósito 1 - Zona A - Pasillo 01 - Estante 01 - Nivel 2;S
