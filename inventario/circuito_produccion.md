@@ -83,3 +83,16 @@ Si el producto se vende en supermercados, la unidad igual necesita el EAN-13 (la
 4. Configurar en Itrix: orden de producción → lote + vto → envío a impresora.
 5. Piloto con 1 producto 2 semanas; validar lectura con el lector.
 6. Extender al resto.
+
+---
+## Estación de etiquetado en producción
+Producción imprime y pega la etiqueta GS1-128 (producto + lote) al envasar. Logística solo escanea.
+
+| Volumen | Equipo | Operación |
+|---|---|---|
+| Bajo | Impresora térmica de etiquetas (Zebra, TSC, Honeywell) + PC | El operario imprime la tanda y pega a mano |
+| Medio | Impresora + **aplicador semiautomático** (dispensa la etiqueta) | El operario apoya la caja, la máquina pega |
+| Alto | **Print & apply** sobre cinta transportadora | Imprime y pega solo al pasar la caja |
+
+Control: etiquetas emitidas por lote vs cajas escaneadas en el ingreso (prototipo: pestañas 1 y 2 de `escaneo_produccion_pedidos.html`).
+Etiqueta: 100 × 50 mm, papel térmico o transferencia térmica (más duradera), ZPL generado desde el sistema.

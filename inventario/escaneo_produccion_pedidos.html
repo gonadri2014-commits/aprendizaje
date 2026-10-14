@@ -1,5 +1,6 @@
 <title>Escaneo Producción y Pedidos</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script src="https://cdn.jsdelivr.net/npm/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <style>
 /* Layout: herramienta de puesto de trabajo: pestañas arriba, campo de escaneo grande, tabla de estado debajo */
@@ -14,6 +15,7 @@
 :root[data-theme="dark"]{
   --bg:#101614; --surface:#18201d; --fg:#e3eae7; --muted:#97a6a0; --line:#2b3632;
   --accent:#4fc59b; --accent-fg:#0d1a14; --ok:#5fd394; --ok-bg:#163223; --err:#ff8a80; --err-bg:#3a1a18; --warn:#f2c46b; --warn-bg:#3a2e12; color-scheme:dark}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.45}
 .wrap{max-width:1040px;margin:0 auto;padding-block:24px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
 header{display:grid;gap:4px}
@@ -49,22 +51,57 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.85rem;pa
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .log{font-family:var(--mono);font-size:.8rem;color:var(--muted);max-height:160px;overflow:auto;margin:0;padding-left:18px}
 .note{font-size:.85rem;color:var(--muted);margin:0}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.form label{display:grid;gap:4px;font-size:.8rem;color:var(--muted)}
+.form input,.form select{font:inherit;font-size:.95rem;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);min-width:0}
+.etq{background:#fff;color:#000;border:1px dashed #999;border-radius:4px;width:100mm;max-width:100%;padding:3mm 4mm;display:grid;gap:1mm;font-family:Arial,sans-serif}
+.etq b{font-size:15px} .etq span{font-size:12px}
+.etq canvas{max-width:100%;height:auto}
+pre.zpl{font-family:var(--mono);font-size:.78rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto;margin:0}
+td.dif-ok{color:var(--ok);font-weight:600} td.dif-err{color:var(--err);font-weight:600}
+@media print{body *{visibility:hidden} #etq-prev,#etq-prev *{visibility:visible} #etq-prev{position:absolute;left:0;top:0}}
 </style>
 
 <div class="wrap">
   <header>
     <h1>Escaneo de producción y pedidos</h1>
-    <p class="sub">Prototipo del circuito: producción transfiere a logística escaneando cada caja (producto + lote), y logística arma el pedido escaneando cada unidad. El sistema valida solo producto, lote y cantidad. Datos de ejemplo precargados.</p>
+    <p class="sub">Prototipo del circuito: producción imprime la etiqueta con producto + lote, transfiere a logística escaneando cada caja (producto + lote), y logística arma el pedido escaneando cada unidad. El sistema valida solo producto, lote y cantidad. Datos de ejemplo precargados.</p>
   </header>
 
   <nav role="tablist">
-    <button role="tab" id="t-ing" aria-selected="true" data-p="p-ing">1. Ingreso de producción</button>
-    <button role="tab" id="t-ped" aria-selected="false" data-p="p-ped">2. Armado de pedido</button>
+    <button role="tab" id="t-etq" aria-selected="true" data-p="p-etq">1. Etiquetado en producción</button>
+    <button role="tab" id="t-ing" aria-selected="false" data-p="p-ing">2. Ingreso de producción</button>
+    <button role="tab" id="t-ped" aria-selected="false" data-p="p-ped">3. Armado de pedido</button>
     <button role="tab" id="t-mae" aria-selected="false" data-p="p-mae">Maestros</button>
   </nav>
 
+  <!-- ETIQUETADO -->
+  <section class="panel" id="p-etq">
+    <div class="card">
+      <h2>Nueva tanda de etiquetas</h2>
+      <div class="form">
+        <label>Producto<select id="etq-prod"></select></label>
+        <label>Lote<input id="etq-lote" autocomplete="off"></label>
+        <label>Vencimiento<input id="etq-vto" type="date"></label>
+        <label>Cantidad de etiquetas<input id="etq-cant" type="number" min="1" value="24"></label>
+      </div>
+      <p class="note">El lote se sugiere solo (siguiente número). Al imprimir, el lote y su vencimiento quedan registrados: después el escaneo los vincula automáticamente.</p>
+      <div class="row"><button class="btn primary" id="etq-gen">Registrar e imprimir</button><button class="btn" id="etq-zpl-copy">Copiar ZPL (impresora Zebra)</button></div>
+      <div id="msg-etq" class="msg ok" hidden></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>Vista previa (100 × 50 mm)</h2>
+        <div id="etq-prev" class="etq"><b id="pv-desc"></b><span id="pv-dat"></span><canvas id="pv-bc"></canvas></div>
+        <p class="note">Código GS1-128 con producto (01) + lote (10). El botón Imprimir funciona con el archivo abierto en la PC de producción.</p></div>
+      <div class="card"><h2>Código ZPL</h2><pre class="zpl" id="etq-zpl"></pre>
+        <p class="note">Formato nativo de impresoras Zebra (y compatibles). Itrix o una PC lo envía a la impresora.</p></div>
+    </div>
+    <div class="card"><h2>Etiquetas emitidas</h2>
+      <div class="tbl"><table><thead><tr><th>Fecha</th><th>Producto</th><th>Lote</th><th>Vencimiento</th><th class="num">Etiquetas</th></tr></thead><tbody id="tb-etq"></tbody></table></div></div>
+  </section>
+
   <!-- INGRESO PRODUCCIÓN -->
-  <section class="panel" id="p-ing">
+  <section class="panel" id="p-ing" hidden>
     <div class="card">
       <span class="label">Escanear cajas producidas</span>
       <input class="scan" id="scan-ing" placeholder="Escanear código (producto + lote)…" autocomplete="off">
@@ -74,9 +111,9 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.85rem;pa
     <div class="card">
       <div class="row" style="justify-content:space-between"><h2>Transferencia producción → logística</h2>
         <div class="row"><button class="btn" id="undo-ing">Deshacer último</button><button class="btn" id="clr-ing">Nueva transferencia</button><button class="btn primary" id="exp-ing">Copiar CSV para Itrix</button></div></div>
-      <div class="tbl"><table><thead><tr><th>Código</th><th>Producto</th><th>Lote</th><th>Vencimiento (del lote)</th><th class="num">Unidades</th></tr></thead><tbody id="tb-ing"></tbody>
-      <tfoot><tr><th colspan="4">Total</th><th class="num" id="tot-ing">0</th></tr></tfoot></table></div>
-      <p class="note">El vencimiento se vincula automáticamente desde el maestro de lotes. Si el lote es nuevo, se completa una sola vez acá y queda guardado.</p>
+      <div class="tbl"><table><thead><tr><th>Código</th><th>Producto</th><th>Lote</th><th>Vencimiento (del lote)</th><th class="num">Etiquetas emitidas</th><th class="num">Unidades escaneadas</th><th class="num">Diferencia</th></tr></thead><tbody id="tb-ing"></tbody>
+      <tfoot><tr><th colspan="5">Total</th><th class="num" id="tot-ing">0</th><th></th></tr></tfoot></table></div>
+      <p class="note">Diferencia = escaneadas − etiquetas emitidas: muestra etiquetas sin usar o cajas sin etiquetar. El vencimiento se vincula automáticamente desde el maestro de lotes. Si el lote es nuevo, se completa una sola vez acá y queda guardado.</p>
     </div>
   </section>
 
@@ -129,14 +166,15 @@ const SAMPLE = {
     {codigo:'P0001', lote:'L0001', vto:'2027-06-30'},
     {codigo:'P0002', lote:'L0002', vto:'2027-08-15'},
   ],
+  etq: [{codigo:'P0001', lote:'L0001', vto:'2027-06-30', cant:2, t:Date.parse('2026-10-14T08:00')},{codigo:'P0002', lote:'L0002', vto:'2027-08-15', cant:12, t:Date.parse('2026-10-14T09:30')}],
   pedido: {num:'PED-1001', lineas:[{codigo:'P0001', cant:3},{codigo:'P0002', cant:2}]},
 };
 const DEMO = [['P0001','L0001'],['P0002','L0002'],['P0003','L0003']];
 
 // ---------- estado ----------
 let S;
-function load(){ try{ S = JSON.parse(localStorage.getItem('esc-v1')) }catch(e){} if(!S) S = fresh(); }
-function fresh(){ return {prod:SAMPLE.prod.slice(), lot:SAMPLE.lot.slice(), ing:[], ped:structuredClone(SAMPLE.pedido), pick:[]}; }
+function load(){ try{ S = JSON.parse(localStorage.getItem('esc-v1')) }catch(e){} if(!S) S = fresh(); if(!S.etq) S.etq = []; }
+function fresh(){ return {prod:SAMPLE.prod.slice(), lot:SAMPLE.lot.slice(), etq:structuredClone(SAMPLE.etq), ing:[], ped:structuredClone(SAMPLE.pedido), pick:[]}; }
 function save(){ try{ localStorage.setItem('esc-v1', JSON.stringify(S)) }catch(e){} }
 
 // ---------- GS1 ----------
@@ -188,20 +226,76 @@ function gruposIng(){
   for (const r of S.ing){ const k=r.codigo+'|'+r.lote; m.set(k, {codigo:r.codigo, lote:r.lote, n:(m.get(k)?.n||0)+1}); }
   return [...m.values()];
 }
+const etqDe = (c,l) => S.etq.filter(e => e.codigo===c && e.lote===l).reduce((a,e) => a+e.cant, 0);
+const difCell = d => `<td class="num ${d===0?'dif-ok':'dif-err'}">${d>0?'+':''}${d}</td>`;
 function renderIng(){
   const gs = gruposIng();
   document.getElementById('tb-ing').innerHTML = gs.length ? gs.map(g => {
     const v = vtoDe(g.codigo, g.lote);
     return `<tr><td class="mono">${esc(g.codigo)}</td><td>${esc(descDe(g.codigo))}</td><td class="mono">${esc(g.lote)}</td>
       <td>${v ? esc(v) : `<input type="date" class="vto" id="vto-${esc(g.codigo)}-${esc(g.lote)}" data-c="${esc(g.codigo)}" data-l="${esc(g.lote)}" aria-label="Vencimiento lote ${esc(g.lote)}">`}</td>
-      <td class="num">${g.n}</td></tr>`; }).join('')
-    : `<tr><td colspan="5" class="note">Sin escaneos. Escaneá la primera caja o usá "Simular lector".</td></tr>`;
+      <td class="num">${etqDe(g.codigo,g.lote)}</td><td class="num">${g.n}</td>${difCell(g.n - etqDe(g.codigo,g.lote))}</tr>`; }).join('')
+    : `<tr><td colspan="7" class="note">Sin escaneos. Escaneá la primera caja o usá "Simular lector".</td></tr>`;
   document.getElementById('tot-ing').textContent = S.ing.length;
 }
 document.getElementById('tb-ing').addEventListener('change', e => {
   const i = e.target; if (!i.classList.contains('vto') || !i.value) return;
   S.lot.push({codigo:i.dataset.c, lote:i.dataset.l, vto:i.value}); save(); renderIng(); renderMae();
 });
+
+// ---------- etiquetado ----------
+const $ = id => document.getElementById(id);
+const gtin14 = g => String(g).padStart(14,'0');
+const fmtF = v => v ? v.split('-').reverse().join('/') : '';
+function sugerirLote(){
+  const n = Math.max(0, ...S.lot.concat(S.etq).map(x => parseInt((x.lote||'').replace(/^L/,''),10)).filter(Number.isFinite));
+  return 'L' + String(n+1).padStart(4,'0');
+}
+function etqActual(){
+  const p = S.prod.find(x => x.codigo === $('etq-prod').value) || S.prod[0];
+  return {p, lote:$('etq-lote').value.trim().toUpperCase(), vto:$('etq-vto').value, cant:parseInt($('etq-cant').value,10)||0};
+}
+function zpl({p, lote, vto, cant}){
+  return ['^XA','^CI28','^PW800^LL400',
+    `^FO30,25^A0N,38,38^FD${p.desc}^FS`,
+    `^FO30,75^A0N,28,28^FDCod. ${p.codigo}   Lote ${lote}   Vto ${fmtF(vto)}^FS`,
+    `^FO30,125^BY2^BCN,170,Y,N,N,D^FD(01)${gtin14(p.gtin)}(10)${lote}^FS`,
+    `^PQ${cant}`,'^XZ'].join('\n');
+}
+function renderEtqPrev(){
+  const e = etqActual(); if (!e.p) return;
+  $('pv-desc').textContent = e.p.desc;
+  $('pv-dat').textContent = `Cód. ${e.p.codigo} · Lote ${e.lote||'—'} · Vto ${fmtF(e.vto)||'—'}`;
+  $('etq-zpl').textContent = zpl(e);
+  const cv = $('pv-bc');
+  try{ if (!window.bwipjs) throw 0; bwipjs.toCanvas(cv, {bcid:'gs1-128', text:`(01)${gtin14(e.p.gtin)}(10)${e.lote||'X'}`, scale:2, height:14, includetext:true, textsize:9}); }
+  catch(err){ const c = cv.getContext('2d'); cv.width=300; cv.height=40; c.fillStyle='#000'; c.font='12px monospace'; c.fillText(`(01)${gtin14(e.p.gtin)}(10)${e.lote}`, 4, 24); }
+}
+function renderEtq(){
+  const sel = $('etq-prod'), cur = sel.value;
+  sel.innerHTML = S.prod.map(p => `<option value="${esc(p.codigo)}">${esc(p.codigo)} · ${esc(p.desc)}</option>`).join('');
+  if (cur) sel.value = cur;
+  if (!$('etq-lote').value) $('etq-lote').value = sugerirLote();
+  $('tb-etq').innerHTML = S.etq.slice().reverse().map(e => `<tr><td>${new Date(e.t).toLocaleString()}</td><td>${esc(descDe(e.codigo))}</td><td class="mono">${esc(e.lote)}</td><td>${esc(fmtF(e.vto))}</td><td class="num">${e.cant}</td></tr>`).join('')
+    || '<tr><td colspan="5" class="note">Sin etiquetas emitidas.</td></tr>';
+  renderEtqPrev();
+}
+['etq-prod','etq-lote','etq-vto','etq-cant'].forEach(id => $(id).addEventListener('input', renderEtqPrev));
+$('etq-gen').onclick = () => {
+  const e = etqActual();
+  if (!e.lote) return msg('msg-etq','err','Falta el lote.');
+  if (!e.vto) return msg('msg-etq','err','Falta el vencimiento.');
+  if (e.cant < 1) return msg('msg-etq','err','La cantidad tiene que ser mayor a 0.');
+  const otro = S.lot.find(l => l.lote === e.lote && l.codigo !== e.p.codigo);
+  if (otro) return msg('msg-etq','err',`El lote ${e.lote} ya pertenece a ${descDe(otro.codigo)}. Usar otro número.`);
+  const mismo = S.lot.find(l => l.lote === e.lote && l.codigo === e.p.codigo);
+  if (mismo && mismo.vto !== e.vto) return msg('msg-etq','err',`El lote ${e.lote} ya tiene vencimiento ${fmtF(mismo.vto)}.`);
+  if (!mismo) S.lot.push({codigo:e.p.codigo, lote:e.lote, vto:e.vto});
+  S.etq.push({codigo:e.p.codigo, lote:e.lote, vto:e.vto, cant:e.cant, t:Date.now()}); save();
+  msg('msg-etq','ok',`Registradas ${e.cant} etiquetas · ${e.p.desc} · Lote ${e.lote} · Vto ${fmtF(e.vto)}`);
+  try{ window.print(); }catch(_){} $('etq-lote').value = ''; renderAll();
+};
+$('etq-zpl-copy').onclick = ev => copiar($('etq-zpl').textContent, ev.target);
 
 // ---------- pedido ----------
 function scanPed(raw){
@@ -239,7 +333,7 @@ function renderMae(){
 function filas(txt){ const L = txt.trim().split(/\r?\n/).filter(Boolean); const sep = L[0]?.includes(';')?';':','; return L.map(l => l.split(sep).map(x => x.trim())).filter(r => !/^codigo/i.test(r[0])); }
 document.getElementById('mae-prod-save').onclick = () => { S.prod = filas(document.getElementById('mae-prod').value).map(r => ({codigo:r[0].toUpperCase(), desc:r[1]||r[0], gtin:r[2]||''})); save(); renderAll(); };
 document.getElementById('mae-lot-save').onclick = () => { S.lot = filas(document.getElementById('mae-lot').value).map(r => ({codigo:r[0].toUpperCase(), lote:(r[1]||'').toUpperCase(), vto:r[2]||''})); save(); renderAll(); };
-document.getElementById('reset-all').onclick = () => { S = fresh(); save(); renderAll(); };
+document.getElementById('reset-all').onclick = () => { S = fresh(); save(); document.getElementById('etq-lote').value=''; renderAll(); };
 
 // ---------- acciones ----------
 function copiar(txt, btn){
@@ -276,6 +370,6 @@ document.querySelector('nav').addEventListener('click', e => {
   const inp = document.querySelector('#'+b.dataset.p+' .scan'); if (inp) inp.focus();
 });
 
-function renderAll(){ renderIng(); renderPed(); renderMae(); document.getElementById('ped-txt').value = S.ped.lineas.map(l => l.codigo+';'+l.cant).join('\n'); }
+function renderAll(){ renderEtq(); renderIng(); renderPed(); renderMae(); document.getElementById('ped-txt').value = S.ped.lineas.map(l => l.codigo+';'+l.cant).join('\n'); }
 load(); renderAll();
 </script>
