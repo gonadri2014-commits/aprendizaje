@@ -30,3 +30,19 @@ lote y ubicación en ingreso/egreso.
 ## 5. Impresión y validación
 - Impresora de etiquetas térmica (Zebra o similar).
 - Validar la legibilidad con el lector antes de etiquetar todo el stock.
+
+## 6. Código impreso en el packaging (desde la imprenta)
+Al ir impreso en la caja, el código **tiene que ser GS1 registrado** (no sirve uno interno).
+
+**Fijo (va en el diseño de la caja):** EAN-13 / GTIN de cada presentación.
+**Variable (cambia en cada producción):** lote y vencimiento → no puede ir en el arte fijo.
+Se imprime en la línea de envasado con un **codificador inkjet/láser** (texto + DataMatrix GS1 si el equipo lo permite) o con una etiqueta.
+
+Especificaciones para pasar a diseño/imprenta:
+- Tamaño EAN-13 nominal 37,29 × 25,93 mm (admitido 80 %–200 %); no recortar la altura.
+- Barras oscuras sobre fondo claro (ideal negro sobre blanco). Nunca barras rojas/amarillas.
+- Zonas en blanco a los costados del código.
+- Cara plana, lejos de pliegues, solapas y bordes.
+- Pedir prueba de impresión y validarla con el lector o con el servicio de verificación de GS1 antes del tiraje.
+
+Caja master (corrugado): GTIN-14 en ITF-14, o etiqueta GS1-128 con GTIN + lote + vencimiento.
