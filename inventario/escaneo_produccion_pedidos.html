@@ -84,6 +84,7 @@ td.dif-ok{color:var(--ok);font-weight:600} td.dif-err{color:var(--err);font-weig
         <label>Lote<input id="etq-lote" autocomplete="off"></label>
         <label>Vencimiento<input id="etq-vto" type="date"></label>
         <label>Cantidad de etiquetas<input id="etq-cant" type="number" min="1" value="24"></label>
+        <label>Tipo de código<select id="etq-tipo"><option value="int">Interno: código + lote (ya, sin GS1)</option><option value="gs1">GS1: GTIN + lote (cuando esté registrado)</option></select></label>
       </div>
       <p class="note">El lote se sugiere solo (siguiente número). Al imprimir, el lote y su vencimiento quedan registrados: después el escaneo los vincula automáticamente.</p>
       <div class="row"><button class="btn primary" id="etq-gen">Registrar e imprimir</button><button class="btn" id="etq-zpl-copy">Copiar ZPL (impresora Zebra)</button></div>
@@ -92,7 +93,7 @@ td.dif-ok{color:var(--ok);font-weight:600} td.dif-err{color:var(--err);font-weig
     <div class="grid2">
       <div class="card"><h2>Vista previa (100 × 50 mm)</h2>
         <div id="etq-prev" class="etq"><b id="pv-desc"></b><span id="pv-dat"></span><canvas id="pv-bc"></canvas></div>
-        <p class="note">Código GS1-128 con producto (01) + lote (10). El botón Imprimir funciona con el archivo abierto en la PC de producción.</p></div>
+        <p class="note">Interno: (240) código de producto + (10) lote. GS1: (01) GTIN + (10) lote. Los dos los lee el mismo escáner. El botón Imprimir funciona con el archivo abierto en la PC de producción.</p></div>
       <div class="card"><h2>Código ZPL</h2><pre class="zpl" id="etq-zpl"></pre>
         <p class="note">Formato nativo de impresoras Zebra (y compatibles). Itrix o una PC lo envía a la impresora.</p></div>
     </div>
@@ -183,9 +184,10 @@ const VAR = ['10','21','30','37'];
 function parseGS1(raw){
   let s = raw.trim().replace(/^\][A-Za-z]\d/,'');
   if (s.startsWith('(')) { const o={}; for (const m of s.matchAll(/\((\d{2,4})\)([^(]*)/g)) o[m[1]]=m[2]; return Object.keys(o).length?o:null; }
-  if (!/^(01|02|10|17)/.test(s) || s.length < 16) return null;
+  if (!/^(01|02|10|17|240)/.test(s) || s.length < 8) return null;
   const o={}; let i=0;
   while (i < s.length){
+    if (s.substr(i,3) === '240') { i+=3; const f=s.indexOf(GS,i); o['240']= f<0?s.slice(i):s.slice(i,f); i= f<0?s.length:f+1; continue; }
     const ai = s.substr(i,2); i+=2;
     if (FIJOS[ai]) { o[ai]=s.substr(i,FIJOS[ai]); i+=FIJOS[ai]; }
     else if (VAR.includes(ai)) { const f=s.indexOf(GS,i); o[ai]= f<0?s.slice(i):s.slice(i,f); i= f<0?s.length:f+1; }
@@ -199,6 +201,7 @@ function identificar(raw){
   const g = parseGS1(raw);
   let p = null, lote = null;
   if (g && g['01']) p = S.prod.find(x => strip(x.gtin) === strip(g['01']));
+  else if (g && g['240']) p = S.prod.find(x => x.codigo === g['240'].toUpperCase());
   else p = S.prod.find(x => strip(x.gtin) === strip(raw.trim()) || x.codigo === raw.trim().toUpperCase());
   if (g && g['10']) lote = g['10'].toUpperCase();
   return {p, lote, g};
@@ -253,13 +256,14 @@ function sugerirLote(){
 }
 function etqActual(){
   const p = S.prod.find(x => x.codigo === $('etq-prod').value) || S.prod[0];
-  return {p, lote:$('etq-lote').value.trim().toUpperCase(), vto:$('etq-vto').value, cant:parseInt($('etq-cant').value,10)||0};
+  return {p, lote:$('etq-lote').value.trim().toUpperCase(), vto:$('etq-vto').value, cant:parseInt($('etq-cant').value,10)||0, tipo:$('etq-tipo').value};
 }
-function zpl({p, lote, vto, cant}){
+function datosBC(e){ return (e.tipo==='gs1' && e.p.gtin) ? `(01)${gtin14(e.p.gtin)}(10)${e.lote||'X'}` : `(240)${e.p.codigo}(10)${e.lote||'X'}`; }
+function zpl(e){ const {p, lote, vto, cant} = e;
   return ['^XA','^CI28','^PW800^LL400',
     `^FO30,25^A0N,38,38^FD${p.desc}^FS`,
     `^FO30,75^A0N,28,28^FDCod. ${p.codigo}   Lote ${lote}   Vto ${fmtF(vto)}^FS`,
-    `^FO30,125^BY2^BCN,170,Y,N,N,D^FD(01)${gtin14(p.gtin)}(10)${lote}^FS`,
+    `^FO30,125^BY2^BCN,170,Y,N,N,D^FD${datosBC(e)}^FS`,
     `^PQ${cant}`,'^XZ'].join('\n');
 }
 function renderEtqPrev(){
@@ -268,8 +272,8 @@ function renderEtqPrev(){
   $('pv-dat').textContent = `Cód. ${e.p.codigo} · Lote ${e.lote||'—'} · Vto ${fmtF(e.vto)||'—'}`;
   $('etq-zpl').textContent = zpl(e);
   const cv = $('pv-bc');
-  try{ if (!window.bwipjs) throw 0; bwipjs.toCanvas(cv, {bcid:'gs1-128', text:`(01)${gtin14(e.p.gtin)}(10)${e.lote||'X'}`, scale:2, height:14, includetext:true, textsize:9}); }
-  catch(err){ const c = cv.getContext('2d'); cv.width=300; cv.height=40; c.fillStyle='#000'; c.font='12px monospace'; c.fillText(`(01)${gtin14(e.p.gtin)}(10)${e.lote}`, 4, 24); }
+  try{ if (!window.bwipjs) throw 0; bwipjs.toCanvas(cv, {bcid:'gs1-128', text:datosBC(e), scale:2, height:14, includetext:true, textsize:9}); }
+  catch(err){ const c = cv.getContext('2d'); cv.width=300; cv.height=40; c.fillStyle='#000'; c.font='12px monospace'; c.fillText(datosBC(e), 4, 24); }
 }
 function renderEtq(){
   const sel = $('etq-prod'), cur = sel.value;
@@ -280,7 +284,7 @@ function renderEtq(){
     || '<tr><td colspan="5" class="note">Sin etiquetas emitidas.</td></tr>';
   renderEtqPrev();
 }
-['etq-prod','etq-lote','etq-vto','etq-cant'].forEach(id => $(id).addEventListener('input', renderEtqPrev));
+['etq-prod','etq-lote','etq-vto','etq-cant','etq-tipo'].forEach(id => $(id).addEventListener('input', renderEtqPrev));
 $('etq-gen').onclick = () => {
   const e = etqActual();
   if (!e.lote) return msg('msg-etq','err','Falta el lote.');
@@ -358,8 +362,8 @@ function bindScan(id, fn){ const i = document.getElementById(id); i.addEventList
 bindScan('scan-ing', scanIng); bindScan('scan-ped', scanPed);
 
 function demoBtns(id, fn, scanId){
-  document.getElementById(id).innerHTML = DEMO.map(([c,l]) => { const p = SAMPLE.prod.find(x => x.codigo===c); const code = '01' + '0' + p.gtin + '10' + l;
-    return `<button class="btn demo" data-code="${code}" title="${code}">${c} · ${l}</button>`; }).join('');
+  document.getElementById(id).innerHTML = DEMO.map(([c,l]) => { const p = SAMPLE.prod.find(x => x.codigo===c); const code = '240' + c + GS + '10' + l;
+    return `<button class="btn demo" data-code="${esc(code)}" title="${esc(code.replace(GS,'<GS>'))}">${c} · ${l}</button>`; }).join('');
   document.getElementById(id).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; fn(b.dataset.code); document.getElementById(scanId).focus(); });
 }
 demoBtns('demo-ing', scanIng, 'scan-ing'); demoBtns('demo-ped', scanPed, 'scan-ped');

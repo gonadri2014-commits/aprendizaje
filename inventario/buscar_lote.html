@@ -54,10 +54,11 @@ function parseGS1(raw) {
     for (const m of s.matchAll(/\((\d{2,4})\)([^(]*)/g)) out[m[1]] = m[2];
     return Object.keys(out).length ? out : null;
   }
-  if (!/^(01|02|10|17|21)/.test(s) || s.length < 16) return null;
+  if (!/^(01|02|10|17|21|240)/.test(s) || s.length < 8) return null;
   const out = {};
   let i = 0;
   while (i < s.length) {
+    if (s.substr(i, 3) === '240') { i += 3; const fin = s.indexOf(GS, i); out['240'] = fin === -1 ? s.slice(i) : s.slice(i, fin); i = fin === -1 ? s.length : fin + 1; continue; }
     const ai = s.substr(i, 2); i += 2;
     if (AI_FIJOS[ai]) { out[ai] = s.substr(i, AI_FIJOS[ai]); i += AI_FIJOS[ai]; }
     else if (AI_VAR.includes(ai)) {
@@ -90,9 +91,10 @@ function buscar(raw) {
   const g = parseGS1(raw);
   let lote = g?.['10'] ? norm(g['10']) : null;
   const gtin = g?.['01'] ? sinCeros(g['01']) : null;
+  const cod = g?.['240'] ? norm(g['240']) : null;
   const code = norm(raw);
   let r = [];
-  if (lote) r = filas.filter(f => norm(f.lote) === lote && (!gtin || sinCeros(f.codigo_barras) === gtin || !f.codigo_barras));
+  if (lote) r = filas.filter(f => norm(f.lote) === lote && (!gtin || sinCeros(f.codigo_barras) === gtin || !f.codigo_barras) && (!cod || norm(f.codigo_producto) === cod));
   if (!r.length) r = filas.filter(f => norm(f.lote) === code);                     // lote solo
   if (!r.length) r = filas.filter(f => sinCeros(f.codigo_barras) === sinCeros(code) || norm(f.codigo_producto) === code); // EAN o código interno
   if (!r.length && gtin) r = filas.filter(f => sinCeros(f.codigo_barras) === gtin);
