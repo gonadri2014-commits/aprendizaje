@@ -44,3 +44,42 @@ flowchart LR
 - Si la línea ya tiene codificadora/fechadora.
 - Anticipación y mínimo de tirada de la imprenta; si hace impresión digital de datos variables.
 - Si Itrix maneja órdenes de producción, lotes e impresión de etiquetas.
+
+---
+## Decisión: código de barras con lote impreso en producción (sin stickers en logística)
+
+### Opción 1 – Imprenta pre-imprime el lote (requiere plan congelado)
+Funciona solo si se cumplen TODAS:
+- Plan de producción congelado con la anticipación de la imprenta (ej. 4–6 semanas).
+- Lote **secuencial no atado a la fecha** (L0001, L0002…) para que un atraso no invalide la caja.
+- Vencimiento **fuera** del código pre-impreso: se sella en línea con fechadora simple; Itrix lo asocia al lote.
+- Tamaño de lote fijo (= cantidad de cajas impresas) + margen de merma 3–5 %.
+- Cajas sobrantes de un lote: se registran y destruyen (no se pasan a otro lote).
+- Control en Itrix: cajas impresas vs producidas vs destruidas por lote.
+
+### Opción 2 – Impresión directa en la caja en la línea (recomendada)
+La imprenta entrega cajas con arte + EAN-13 + recuadro blanco. En producción una impresora
+imprime **directo sobre el cartón** el GS1-128 (01+10+17) + texto "Lote / Vto". Sin etiquetas.
+
+| Volumen | Equipo | Cómo se usa |
+|---|---|---|
+| Bajo (manual) | Impresora inkjet térmica (TIJ) **de mano** | El operario la pasa sobre cada caja |
+| Medio/alto | **TIJ fija sobre cinta transportadora** + sensor | Imprime sola al pasar la caja |
+| Caja master | TIJ de cabezal ancho o **print & apply** (imprime y pega etiqueta) | Automático al final de línea |
+| Envase flexible (film) | Impresora de transferencia térmica (TTO) | Integrada a la envasadora |
+
+Requisitos al proveedor: imprimir GS1-128 y DataMatrix verificables, superficie (cartulina/corrugado),
+altura de impresión ≥ 12,7 mm, conexión con PC/Itrix para recibir lote y vto sin tipear.
+
+### Ojo con el tamaño
+GS1-128 con producto + lote + vto mide ~8–11 cm de ancho. Si la caja chica no tiene lugar,
+usar DataMatrix GS1 (mismos datos, ~1–2 cm) o dejar el EAN-13 para venta y el GS1-128 en la caja master.
+Si el producto se vende en supermercados, la unidad igual necesita el EAN-13 (las cajas de venta no leen GS1-128).
+
+### Implementación
+1. Relevar SKUs, volumen por turno, tipo de caja y espacio libre.
+2. Rediseñar arte con recuadro blanco y mandar a imprenta.
+3. Pedir demo a 2–3 proveedores de codificación con cajas reales.
+4. Configurar en Itrix: orden de producción → lote + vto → envío a impresora.
+5. Piloto con 1 producto 2 semanas; validar lectura con el lector.
+6. Extender al resto.
