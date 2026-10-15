@@ -55,3 +55,14 @@
 - Lista de lo que Itrix **sí** hace, **no** hace y **hace con desarrollo** (costo y plazo).
 - Fecha de entrega de cada exportación.
 - Responsable de Sistemas como referente del proyecto.
+
+## Datos para calcular los beneficios (con Administración)
+| Dato | Para calcular |
+|---|---|
+| Costo hora promedio del personal administrativo y de depósito | Horas liberadas |
+| Costo de un error de armado (reenvío, flete, nota de crédito) | Menos errores |
+| Stock vencido o dado de baja en los últimos 12 meses ($) | Menos vencidos |
+| Pedidos no entregados o incompletos por falta de stock | Menos faltantes |
+| Ventas diarias promedio y tasa de interés de referencia | Caja liberada (cobro y stock) |
+| Notas de crédito, descuentos y ajustes de stock del último año | Más control |
+| Costo de la inversión (equipos, desarrollos, licencias) | Retorno y meses de recupero |
