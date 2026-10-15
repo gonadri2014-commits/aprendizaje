@@ -532,9 +532,9 @@ function buildSlides(){
   const acts = ready.flatMap(([id, t]) => plan(id).X.map(a => ({...a, area:t})));
   const fase = f => li(acts.filter(a => a.f === f).map(a => a.t));
   S.push({pend: ready.length < AREAS.length, html: i => `<span class="eyebrow">Hoja de ruta</span><h3>Implementación por fases</h3>
-    <div class="cols"><div class="box"><h4>Fase 1 · 0 a 30 días</h4><ul>${fase(1)}</ul></div>
-    <div class="box"><h4>Fase 2 · 1 a 3 meses</h4><ul>${fase(2)}</ul></div>
-    <div class="box"><h4>Fase 3 · 3 a 6 meses</h4><ul>${fase(3)}</ul></div></div>
+    <div class="cols"><div class="box"><h4>Fase 1 · meses 1 a 3</h4><ul>${fase(1)}</ul></div>
+    <div class="box"><h4>Fase 2 · meses 3 a 6</h4><ul>${fase(2)}</ul></div>
+    <div class="box"><h4>Fase 3 · meses 6 a 12</h4><ul>${fase(3)}</ul></div></div>
     ${ready.length < AREAS.length ? `<span class="lead" style="font-size:1.2cqw">Incluye ${ready.length} de ${AREAS.length} áreas. El resto se suma al completar el relevamiento.</span>` : ''}${foot(i)}`});
   // Próximos pasos
   const faltan = QS.filter(q => qState(q) !== 'done');
