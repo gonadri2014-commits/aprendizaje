@@ -82,8 +82,8 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px soli
 .slide li{font-size:1.3cqw}
 .slide li.more{list-style:none;margin-left:-1.4cqw;color:var(--slide-accent);font-family:var(--mono);font-size:1.1cqw}
 .slide .tag{font-family:var(--mono);font-size:1cqw;padding:.15cqw .6cqw;border-radius:.4cqw;background:rgba(111,220,177,.15);color:var(--slide-accent);margin-right:.5cqw;white-space:nowrap}
-.slide .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9cqw 3cqw;flex:1;align-content:start}
-.slide .chk{display:flex;gap:1cqw;align-items:center;font-size:1.5cqw;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:.6cqw}
+.slide .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6cqw 3cqw;flex:1;align-content:start}
+.slide .chk{display:flex;gap:1cqw;align-items:center;font-size:1.35cqw;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:.4cqw}
 .slide .chk i{font-style:normal;width:2.4cqw;height:2.4cqw;border-radius:50%;display:grid;place-items:center;font-size:1.3cqw;font-weight:700;flex:none}
 .slide .chk i.y{background:#2e9e6e;color:#fff} .slide .chk i.n{background:#c4483f;color:#fff} .slide .chk i.u{background:#6b5a2a;color:#f6d98b}
 .slide .pend{border:2px dashed #b99a45;border-radius:.8cqw;padding:2cqw;color:#f1dc9e;display:grid;gap:1cqw;flex:1;align-content:start}
@@ -144,6 +144,18 @@ const SECS = [
   {id:'sis_api', t:'¿Cómo se pueden sacar datos de Itrix?', o:['API','Exportación programada','Solo exportación manual',NS]},
   {id:'sis_autoriz', t:'¿Itrix tiene circuito de aprobaciones / autorizaciones?', o:['Sí, lo usamos','Sí, no lo usamos','No',NS]},
  ]},
+ {id:'erp', t:'Evaluación del sistema', qs:[
+  {id:'erp_satisf', t:'¿Qué tan conformes están con Itrix?', o:['Muy conformes','Más o menos','Poco conformes']},
+  {id:'erp_custom', t:'¿Itrix hace modificaciones a medida cuando las piden?', o:['Sí, rápido y a costo razonable','Sí, pero lento o caro','No hace',NS]},
+  {id:'erp_soporte', t:'¿Cómo es el soporte de Itrix?', o:['Bueno','Regular','Malo']},
+  {id:'erp_costo', t:'¿Cómo es el costo de Itrix (licencias + soporte)?', o:['Razonable','Alto',NS]},
+  {id:'erp_usuarios', t:'¿Cuántas personas usan el sistema?', o:['Menos de 5','5 a 15','15 a 50','Más de 50']},
+  {id:'erp_integr', t:'¿Con qué necesitan integrar el sistema?', m:['Tienda online / e-commerce','Mercado Libre','Bancos','App de vendedores','Colectores de depósito','Dashboard / BI','Ninguno por ahora']},
+  {id:'erp_fiscal', t:'¿Qué complejidad impositiva tienen?', o:['Simple','Percepciones / retenciones / convenio multilateral',NS]},
+  {id:'erp_it', t:'¿Tienen quién desarrolle o mantenga sistemas?', o:['Equipo interno','Proveedor externo','No']},
+  {id:'erp_contrato', t:'¿El contrato con Itrix tiene permanencia mínima?', o:['Sí','No',NS]},
+  {id:'erp_datos', t:'¿Pueden exportar todos los datos de Itrix (maestros, saldos, histórico)?', o:['Sí','Parcial',NS]},
+ ]},
  {id:'prod', t:'Productos y códigos', qs:[
   {id:'prod_skus', t:'¿Cuántos productos (SKU) activos tienen?', o:['Menos de 50','50 a 200','200 a 1.000','Más de 1.000',NS]},
   {id:'prod_mayor', t:'¿Tienen el mayor de productos con su código?', o:['Sí','Pedido','No']},
@@ -191,6 +203,24 @@ const SECS = [
   {id:'dash_usu', t:'¿Quiénes lo van a usar?', m:['Dueña','Gerencia','Administración','Producción','Logística','Comercial']},
   {id:'dash_frec', t:'¿Con qué frecuencia necesitan los datos?', o:['Tiempo real','Diario','Semanal','Mensual']},
   {id:'dash_herr', t:'¿Herramienta preferida?', o:['Power BI','Looker Studio','Excel','Web propia','Sin preferencia']},
+ ]},
+ {id:'imp', t:'Compras e importaciones', qs:[
+  {id:'imp_si', t:'¿Importan mercadería o insumos?', o:['Sí, la mayoría','Sí, algunos','No']},
+  {id:'imp_lead', t:'¿Cuánto tarda una importación desde el pedido hasta el depósito?', o:['Menos de 30 días','30 a 60 días','60 a 120 días','Más de 120 días',NS]},
+  {id:'imp_como', t:'¿Cómo deciden cuándo y cuánto pedir?', o:['Experiencia / intuición','Planilla Excel','Reporte de Itrix','Punto de pedido en el sistema']},
+  {id:'imp_quiebre', t:'¿Tuvieron faltantes (quiebres) de stock en el último año?', o:['Frecuentes','Algunos','No']},
+  {id:'imp_sobre', t:'¿Hay sobrestock o mercadería que se vence sin vender?', o:['Frecuente','A veces','No']},
+  {id:'imp_seg', t:'¿Cómo siguen los embarques (salida, llegada, despacho)?', o:['En el sistema','Planilla','Por mail','No se sigue']},
+  {id:'imp_prov', t:'¿Cuántos proveedores del exterior tienen?', o:['1 a 3','4 a 10','Más de 10']},
+  {id:'imp_moq', t:'¿Los proveedores tienen mínimos de compra o por contenedor?', o:['Sí','No',NS]},
+  {id:'imp_pago', t:'¿Cómo pagan las importaciones?', o:['Anticipo + saldo','Al embarque','Carta de crédito','A plazo','Otro']},
+  {id:'imp_hist', t:'¿Hay historial de ventas / consumo por producto en Itrix?', o:['Sí, más de 1 año','Menos de 1 año','No']},
+ ]},
+ {id:'alr', t:'Alertas y controles', qs:[
+  {id:'alr_manual', t:'¿Qué controles se hacen hoy a mano?', m:['Stock mínimo / reposición','Vencimientos próximos','Pedidos atrasados sin despachar','Embarques atrasados','Cobranzas vencidas','Pagos a vencer','Diferencias de inventario','Ventas bajo costo / margen bajo','Saldo bancario mínimo','Producción vs plan']},
+  {id:'alr_canal', t:'¿Por dónde quieren recibir las alertas?', m:['WhatsApp','Mail','Panel / dashboard','Teams o Slack']},
+  {id:'alr_inv', t:'¿Hacen conteos de inventario?', o:['Cíclicos (por sector)','Anual','No']},
+  {id:'alr_resp', t:'¿Cada control tiene un responsable asignado?', o:['Sí','Algunos','No']},
  ]},
  {id:'inf', t:'Infraestructura', qs:[
   {id:'inf_pc_prod', t:'¿Hay PC o tablet en producción?', o:['Sí','No']},
@@ -358,6 +388,70 @@ function plan(sec){
     if (has('adm_cash','Diario') || has('adm_cash','Semanal')) T.push('Cashflow ' + val('adm_cash').toLowerCase());
     else if (val('adm_cash')) { F.push('Cashflow frecuente'); act('Cashflow semanal automático: bancos + cobranzas + pagos proyectados', 2); }
     break; }
+  case 'erp': {
+    let sc = 0; const why = [];
+    const add = (c, n, t) => { if (c) { sc += n; why.push(t); } };
+    add(has('erp_satisf','Poco conformes'), 2, 'baja conformidad con Itrix'); add(has('erp_satisf','Más o menos'), 1, 'conformidad media');
+    add(has('erp_custom','No hace'), 2, 'no permite modificaciones a medida'); add(has('erp_custom','Sí, pero lento o caro'), 1, 'modificaciones lentas o caras');
+    add(has('erp_soporte','Malo'), 1, 'soporte malo'); add(has('erp_costo','Alto'), 1, 'costo alto');
+    const ints = (val('erp_integr') || []).filter(x => x !== 'Ninguno por ahora'); add(ints.length >= 3, 1, 'necesita ' + ints.length + ' integraciones');
+    add(has('sis_api','Solo exportación manual'), 1, 'sin extracción automática de datos');
+    add(has('sis_lotes','No'), 1, 'no maneja lotes'); add(has('sis_ubic','No'), 1, 'no maneja ubicaciones');
+    if (has('erp_satisf','Muy conformes')) T.push('Conformes con Itrix');
+    if (has('erp_custom','Sí, rápido y a costo razonable')) T.push('Itrix hace desarrollos a medida');
+    if (has('erp_datos','Sí')) T.push('Datos exportables (facilita cualquier cambio)'); else if (val('erp_datos')) F.push('Confirmar exportación completa de datos de Itrix');
+    why.forEach(w => F.push(w.charAt(0).toUpperCase() + w.slice(1)));
+    if (sc >= 5) {
+      T.push(`Puntaje de cambio: ${sc} → conviene evaluar migración`);
+      act('Comparar Itrix vs Odoo (y 1 alternativa): costo total a 3 años, módulos, impuestos argentinos, desarrollos', 1);
+      act('Demo de Odoo con un partner con localización argentina (factura electrónica ARCA, percepciones, IIBB)', 2);
+      act('Piloto de Odoo en un área (stock + lotes + etiquetas) antes de decidir la migración completa', 2);
+      act('Migración por etapas con período en paralelo: maestros → stock → compras/ventas → contabilidad', 3);
+      if (has('erp_contrato','Sí')) act('Revisar fecha de fin de permanencia de Itrix para planificar el cambio', 1);
+    } else if (sc >= 3) {
+      T.push(`Puntaje de cambio: ${sc} → seguir con Itrix y complementar`);
+      act('Seguir con Itrix y cubrir lo que falta con herramientas complementarias (escaneo, alertas, dashboard)', 1);
+      act('Pedir a Itrix cotización y plazo de las mejoras clave; reevaluar el cambio en 12 meses', 2);
+    } else {
+      T.push(`Puntaje de cambio: ${sc} → seguir con Itrix`);
+      act('Seguir con Itrix y pedir las mejoras puntuales (lotes, etiquetas, exportación automática)', 1);
+    }
+    if (has('erp_it','No') && sc >= 5) act('Definir partner de implementación y soporte (Odoo requiere un proveedor que lo mantenga)', 2);
+    break; }
+  case 'imp': {
+    if (has('imp_si','No')) { T.push('No importan'); act('Alarma de reposición para compras locales con el mismo cálculo de cobertura', 2); break; }
+    const lead = val('imp_lead'); if (lead && lead !== NS) T.push('Lead time de importación: ' + lead.toLowerCase());
+    if (has('imp_como','Punto de pedido en el sistema')) T.push('Punto de pedido en el sistema');
+    else if (val('imp_como')) { F.push('Punto de pedido calculado'); act('Calcular punto de pedido y stock de seguridad por producto: consumo diario × lead time + seguridad', 1); }
+    act('Alarma de reposición de importados: aviso cuando stock + en tránsito no cubre el lead time' + (has('imp_quiebre','Frecuentes') ? ' (prioridad: hay quiebres frecuentes)' : ''), 1);
+    if (has('imp_hist','No')) { F.push('Historial de consumo por producto'); act('Registrar consumo mensual por producto (base del cálculo)', 1); }
+    else if (val('imp_hist')) T.push('Historial de ventas: ' + val('imp_hist').toLowerCase());
+    if (has('imp_seg','En el sistema')) T.push('Embarques seguidos en el sistema');
+    else if (val('imp_seg')) { F.push('Seguimiento de embarques'); act('Tablero de embarques: fecha de salida, llegada estimada, despacho y alerta por atraso', 2); }
+    if (has('imp_sobre','Frecuente') || has('imp_sobre','A veces')) { F.push('Control de sobrestock'); act('Alerta de sobrestock: productos con cobertura mayor a 6 meses o vencimiento antes de venderse', 2); }
+    if (has('imp_moq','Sí')) act('Cantidad sugerida a pedir respetando mínimos del proveedor y capacidad del contenedor', 2);
+    if (val('imp_pago')) act('Impacto en el cashflow de anticipos y saldos de importación (USD y pesos)', 2);
+    if (has('imp_lead','Más de 120 días') || has('imp_lead','60 a 120 días')) act('Pronóstico de demanda a 6 meses por producto con estacionalidad', 3);
+    break; }
+  case 'alr': {
+    const m = val('alr_manual') || []; const canal = (val('alr_canal') || []).join(' / ') || 'mail';
+    const AL = {
+      'Stock mínimo / reposición': ['Alerta de reposición por producto según punto de pedido', 1],
+      'Vencimientos próximos': ['Alerta de lotes que vencen en 30 / 60 / 90 días', 1],
+      'Pedidos atrasados sin despachar': ['Alerta de pedidos con más de N días sin despachar', 1],
+      'Embarques atrasados': ['Alerta de embarques con llegada estimada vencida', 2],
+      'Cobranzas vencidas': ['Alerta diaria de facturas vencidas por cliente', 1],
+      'Pagos a vencer': ['Agenda de pagos de los próximos 7 días', 1],
+      'Diferencias de inventario': ['Alerta de diferencias entre conteo y sistema por encima de un umbral', 2],
+      'Ventas bajo costo / margen bajo': ['Alerta de ventas con margen menor al mínimo definido', 2],
+      'Saldo bancario mínimo': ['Alerta de saldo proyectado por debajo del mínimo', 2],
+      'Producción vs plan': ['Alerta de desvío de producción contra el plan', 3],
+    };
+    m.forEach(x => { F.push('Automatizar: ' + x.toLowerCase()); if (AL[x]) act(`${AL[x][0]} (por ${canal})`, AL[x][1]); });
+    if (has('alr_inv','Cíclicos (por sector)')) T.push('Conteos cíclicos');
+    else if (val('alr_inv')) { F.push('Conteos cíclicos'); act('Conteos cíclicos con lector: productos A cada mes, B cada trimestre, C cada semestre', 2); }
+    if (has('alr_resp','Sí')) T.push('Responsables asignados'); else if (val('alr_resp')) act('Asignar responsable y plazo de respuesta a cada alerta', 1);
+    break; }
   case 'dash': {
     const k = val('dash_kpi') || []; if (val('dash_rep')) T.push('Reportes actuales: ' + val('dash_rep'));
     const api = val('sis_api');
@@ -385,6 +479,8 @@ const DIAG = [
   ['Aprobaciones con registro','aut_traza',['Siempre'],['A veces','No']],
   ['Cashflow semanal o diario','adm_cash',['Diario','Semanal'],['Mensual','No se hace']],
   ['Extracción automática de datos','sis_api',['API','Exportación programada'],['Solo exportación manual']],
+  ['Punto de pedido calculado','imp_como',['Punto de pedido en el sistema'],['Experiencia / intuición','Planilla Excel','Reporte de Itrix']],
+  ['Seguimiento de embarques','imp_seg',['En el sistema'],['Planilla','Por mail','No se sigue']],
 ];
 function diag([, id, pos, neg]){
   const v = val(id); if (isEmpty(v) || v === NS) return 'u';
@@ -393,7 +489,9 @@ function diag([, id, pos, neg]){
 }
 
 // ================= PRESENTACIÓN =================
-const AREAS = [['prod','Productos y códigos'],['etq','Plan de etiquetado'],['log','Logística y depósito'],['aut','Sistema de autorizaciones'],['adm','Automatizaciones en administración'],['dash','Dashboard y reportes']];
+const AREAS = [['erp','Sistema: seguir con Itrix o cambiar'],['prod','Productos y códigos'],['etq','Plan de etiquetado'],['log','Logística y depósito'],['aut','Sistema de autorizaciones'],['adm','Automatizaciones en administración'],['imp','Compras e importaciones'],['alr','Alertas y controles automáticos'],['dash','Dashboard y reportes']];
+const NEED = {erp:['erp','sis'], etq:['etq','prod','inf'], log:['log','sis'], aut:['aut','sis'], dash:['dash','sis']};
+const needOf = id => NEED[id] || [id];
 let cur = 0, slides = [];
 const secOf = id => SECS.find(s => s.id === id);
 function pendSecs(ids){ return ids.map(secOf).filter(s => !secStats(s).done); }
@@ -407,12 +505,12 @@ function buildSlides(){
   const all = QS.length, done = QS.filter(q => qState(q)==='done').length, p = Math.round(done/all*100);
   const S = [];
   S.push({pend:false, html: i => `<span class="eyebrow">${esc(fecha)}</span><h3 class="big">Plan de automatización e implementación</h3>
-    <p class="lead">Etiquetado, logística, autorizaciones, administración y dashboard. Armado a partir del relevamiento de lo que hay y lo que falta.</p>
+    <p class="lead">Sistema, etiquetado, logística, importaciones, alertas, autorizaciones, administración y dashboard. Armado a partir del relevamiento de lo que hay y lo que falta.</p>
     <div style="margin-top:auto;display:flex;gap:4cqw;align-items:end"><div><div class="kpi">${p}%</div><span class="lead">relevado (${done} de ${all})</span></div></div>${foot(i)}`});
   S.push({pend: DIAG.some(d => diag(d)==='u'), html: i => `<span class="eyebrow">Diagnóstico</span><h3>Qué tenemos y qué no</h3>
     <div class="grid">${DIAG.map(d => { const s = diag(d); return `<div class="chk"><i class="${s}">${s==='y'?'✓':s==='n'?'✕':'?'}</i>${esc(d[0])}</div>`; }).join('')}</div>${foot(i)}`});
   AREAS.forEach(([id, titulo]) => {
-    const need = id === 'etq' ? ['etq','prod','inf'] : id === 'log' ? ['log','sis'] : id === 'aut' ? ['aut','sis'] : id === 'dash' ? ['dash','sis'] : [id];
+    const need = needOf(id);
     const pend = pendSecs(need);
     if (pend.length) {
       S.push({pend:true, html: i => `<span class="eyebrow">${esc(titulo)}</span><h3>${esc(titulo)}</h3>
@@ -427,7 +525,7 @@ function buildSlides(){
     }
   });
   // Hoja de ruta
-  const ready = AREAS.filter(([id]) => !pendSecs(id === 'etq' ? ['etq','prod','inf'] : ['log','aut','dash'].includes(id) ? [id,'sis'] : [id]).length);
+  const ready = AREAS.filter(([id]) => !pendSecs(needOf(id)).length);
   const acts = ready.flatMap(([id, t]) => plan(id).X.map(a => ({...a, area:t})));
   const fase = f => li(acts.filter(a => a.f === f).map(a => a.t));
   S.push({pend: ready.length < AREAS.length, html: i => `<span class="eyebrow">Hoja de ruta</span><h3>Implementación por fases</h3>
