@@ -1,0 +1,164 @@
+<title>Cotizador Asistente WhatsApp</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: resumen de cifras arriba, supuestos editables en dos columnas, detalle de horas y costos mensuales abajo */
+:root{
+  --bg:#f2f4f3; --surface:#ffffff; --fg:#16201b; --muted:#5b6964; --line:#d5ddd9; --soft:#e8eeeb;
+  --accent:#0b6e4f; --accent-fg:#ffffff; --warn:#8a5a00; --warn-bg:#fdf1d8;
+  --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101614; --surface:#18201d; --fg:#e3eae7; --muted:#97a6a0; --line:#2b3632; --soft:#202a26; --accent:#4fc59b; --accent-fg:#0d1a14; --warn:#f2c46b; --warn-bg:#3a2e12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#101614; --surface:#18201d; --fg:#e3eae7; --muted:#97a6a0; --line:#2b3632; --soft:#202a26; --accent:#4fc59b; --accent-fg:#0d1a14; --warn:#f2c46b; --warn-bg:#3a2e12; color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.45}
+.wrap{max-width:1100px;margin:0 auto;padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+h1{margin:0;font-size:1.45rem;text-wrap:balance}
+.sub{margin:4px 0 0;color:var(--muted);max-width:78ch}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:2px}
+.tile.main{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.tile b{font-size:1.7rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile span{font-size:.85rem;opacity:.85}
+.tile small{font-size:.8rem;opacity:.8;font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:12px;min-width:0;align-content:start}
+.card h2{margin:0;font-size:1rem}
+.f{display:grid;grid-template-columns:1fr 130px;gap:8px;align-items:center;font-size:.9rem}
+.f input,.f select{font:inherit;font-size:.9rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);min-width:0;text-align:right;font-variant-numeric:tabular-nums}
+.f select{text-align:left}
+.f label{color:var(--fg)}
+.f small{display:block;color:var(--muted);font-size:.78rem}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}
+th{font-weight:500;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.04em}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td input{width:70px;font:inherit;font-size:.9rem;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);text-align:right}
+tfoot td{font-weight:600}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.warn{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:10px 14px;font-size:.85rem}
+.btn{font:inherit;font-size:.85rem;padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;justify-self:start}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Cotizador del asistente de catálogo por WhatsApp</h1>
+    <p class="sub">Inversión inicial (desarrollo + alta) y costo mensual de operación. Todos los supuestos se pueden editar; los precios de terceros son de referencia y hay que confirmarlos antes de presentar.</p>
+  </header>
+
+  <div class="tiles">
+    <div class="tile main"><span>Inversión inicial</span><b id="o-ini">—</b><small id="o-ini-ars"></small></div>
+    <div class="tile"><span>Costo mensual de operación</span><b id="o-mes">—</b><small id="o-mes-ars"></small></div>
+    <div class="tile"><span>Costo primer año (inicial + 12 meses)</span><b id="o-anio">—</b><small id="o-anio-ars"></small></div>
+    <div class="tile"><span>Costo por consulta atendida</span><b id="o-cq">—</b><small id="o-plazo"></small></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Volumen y WhatsApp</h2>
+      <div class="f"><label for="consultas">Consultas por mes<small>conversaciones de clientes</small></label><input id="consultas" type="number" min="0" value="3000"></div>
+      <div class="f"><label for="msgs">Mensajes del bot por consulta</label><input id="msgs" type="number" min="0" step="0.5" value="2"></div>
+      <div class="f"><label for="gratis">Mensajes de servicio gratis por mes<small>según fuentes no oficiales, por número</small></label><input id="gratis" type="number" min="0" value="1000"></div>
+      <div class="f"><label for="tarifa">Tarifa Meta por mensaje (USD)<small>Argentina, servicio/utilidad, referencia</small></label><input id="tarifa" type="number" min="0" step="0.001" value="0.026"></div>
+      <div class="f"><label for="plataforma">Plataforma</label><select id="plataforma"><option value="propia">Desarrollo propio (API de Meta directa)</option><option value="nocode">Plataforma de bots (proveedor)</option></select></div>
+      <div class="f"><label for="plat_costo">Costo mensual plataforma / hosting (USD)<small>servidor propio o suscripción del proveedor</small></label><input id="plat_costo" type="number" min="0" value="20"></div>
+    </div>
+    <div class="card">
+      <h2>Inteligencia artificial</h2>
+      <div class="f"><label for="modelo">Modelo de IA</label><select id="modelo">
+        <option value="4|20">Claude Opus 5.5 (USD 4 / 20 por millón)</option>
+        <option value="2|10">Claude Sonnet 5.5 (USD 2 / 10 por millón)</option>
+        <option value="0.1|0.5">Claude Haiku 5.5 (USD 0,10 / 0,50 por millón)</option>
+      </select></div>
+      <div class="f"><label for="tin">Tokens de entrada por consulta<small>instrucciones + productos candidatos</small></label><input id="tin" type="number" min="0" value="3000"></div>
+      <div class="f"><label for="tout">Tokens de salida por consulta</label><input id="tout" type="number" min="0" value="300"></div>
+      <h2 style="margin-top:6px">Servicio y moneda</h2>
+      <div class="f"><label for="vh">Valor hora del servicio (USD)<small>desarrollo e implementación</small></label><input id="vh" type="number" min="0" value="30"></div>
+      <div class="f"><label for="soporte">Horas de soporte y mejoras por mes</label><input id="soporte" type="number" min="0" value="4"></div>
+      <div class="f"><label for="tc">Tipo de cambio (ARS por USD)<small>opcional, para mostrar en pesos</small></label><input id="tc" type="number" min="0" placeholder="—"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Desarrollo: horas por etapa</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Etapa</th><th>Qué incluye</th><th class="num">Horas</th><th class="num">USD</th></tr></thead>
+      <tbody id="tb-h"></tbody>
+      <tfoot><tr><td colspan="2">Total desarrollo</td><td class="num" id="h-tot"></td><td class="num" id="h-usd"></td></tr></tfoot>
+    </table></div>
+    <p class="note" id="plazo-txt"></p>
+  </div>
+
+  <div class="card">
+    <h2>Operación mensual</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Concepto</th><th>Cálculo</th><th class="num">USD / mes</th></tr></thead>
+      <tbody id="tb-m"></tbody>
+      <tfoot><tr><td colspan="2">Total mensual</td><td class="num" id="m-tot"></td></tr></tfoot>
+    </table></div>
+  </div>
+
+  <div class="warn">Precios a confirmar: tarifa de WhatsApp en <b>whatsappbusiness.com/products/platform-pricing</b> (Meta factura en pesos en Argentina) y precios de IA en la consola de Anthropic. El valor hora es una referencia para ajustar.</div>
+  <button class="btn" id="reset" type="button">Volver a los valores iniciales</button>
+</div>
+
+<script>
+const TAREAS = [
+  ['Catálogo para el bot', 'Export de Itrix o de la web con link por producto, descripciones y palabras clave', 20],
+  ['Alta de WhatsApp Business API', 'Verificación de Meta, número oficial, perfil y plantillas', 10],
+  ['Motor de búsqueda con IA', 'Interpretación de términos técnicos, reglas (sin indicaciones clínicas), derivación a vendedor', 32],
+  ['Integración con WhatsApp', 'Recepción y respuesta de mensajes, links al producto, botones', 20],
+  ['Panel de métricas', 'Consultas, búsquedas sin resultado, clics y derivaciones', 16],
+  ['Piloto y ajustes', 'Prueba con una familia de productos, correcciones, extensión al catálogo', 20],
+  ['Capacitación y documentación', 'Equipo comercial, manual de uso y mantenimiento', 8],
+];
+const IDS = ['consultas','msgs','gratis','tarifa','plataforma','plat_costo','modelo','tin','tout','vh','soporte','tc'];
+const $ = id => document.getElementById(id);
+const LS = 'cotizador-bot-v1';
+const DEF = {}; IDS.forEach(id => DEF[id] = $(id).value);
+let horas = TAREAS.map(t => t[2]);
+const usd = x => 'USD ' + Math.round(x).toLocaleString('es-AR');
+const usd2 = x => 'USD ' + x.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:3});
+const ars = x => { const tc = +$('tc').value; return tc > 0 ? '$ ' + Math.round(x * tc).toLocaleString('es-AR') : ''; };
+
+function render(){
+  const v = id => +$(id).value || 0;
+  const [pin, pout] = $('modelo').value.split('|').map(Number);
+  $('tb-h').innerHTML = TAREAS.map((t,i) => `<tr><td>${t[0]}</td><td class="note">${t[1]}</td><td class="num"><input type="number" min="0" data-i="${i}" value="${horas[i]}" aria-label="Horas ${t[0]}"></td><td class="num">${usd(horas[i]*v('vh'))}</td></tr>`).join('');
+  const hTot = horas.reduce((a,b) => a+b, 0), dev = hTot * v('vh');
+  $('h-tot').textContent = hTot + ' h'; $('h-usd').textContent = usd(dev);
+  const semanas = Math.ceil(hTot / 20);
+  $('plazo-txt').textContent = `Plazo estimado: ${semanas} semanas dedicando unas 20 h por semana (en paralelo con el resto del proyecto), más 1 a 3 semanas de espera por la verificación de Meta, que corre en paralelo.`;
+  const msgs = v('consultas') * v('msgs'), cobrables = Math.max(0, msgs - v('gratis'));
+  const wa = cobrables * v('tarifa');
+  const ia = v('consultas') * (v('tin') * pin + v('tout') * pout) / 1e6;
+  const plat = v('plat_costo'), sop = v('soporte') * v('vh');
+  const rows = [
+    ['Mensajes de WhatsApp (Meta)', `${msgs.toLocaleString('es-AR')} mensajes − ${v('gratis').toLocaleString('es-AR')} gratis = ${cobrables.toLocaleString('es-AR')} × ${usd2(v('tarifa'))}`, wa],
+    ['Inteligencia artificial', `${v('consultas').toLocaleString('es-AR')} consultas × (${v('tin')} + ${v('tout')} tokens)`, ia],
+    [$('plataforma').value === 'propia' ? 'Servidor / hosting' : 'Suscripción plataforma de bots', 'costo fijo', plat],
+    ['Soporte y mejoras', `${v('soporte')} h × ${usd(v('vh'))}`, sop],
+  ];
+  $('tb-m').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td class="note">${r[1]}</td><td class="num">${r[2] < 10 ? usd2(r[2]) : usd(r[2])}</td></tr>`).join('');
+  const mes = wa + ia + plat + sop;
+  $('m-tot').textContent = usd(mes);
+  $('o-ini').textContent = usd(dev); $('o-ini-ars').textContent = ars(dev);
+  $('o-mes').textContent = usd(mes); $('o-mes-ars').textContent = ars(mes);
+  $('o-anio').textContent = usd(dev + 12*mes); $('o-anio-ars').textContent = ars(dev + 12*mes);
+  $('o-cq').textContent = v('consultas') ? usd2(mes / v('consultas')) : '—';
+  $('o-plazo').textContent = `${hTot} h de desarrollo · ${semanas} semanas`;
+  try{ localStorage.setItem(LS, JSON.stringify({vals:Object.fromEntries(IDS.map(id => [id, $(id).value])), horas})); }catch(e){}
+}
+document.addEventListener('input', e => {
+  if (e.target.dataset.i !== undefined) { horas[+e.target.dataset.i] = +e.target.value || 0; const pos = e.target.selectionStart; render(); const el = document.querySelector(`[data-i="${e.target.dataset.i}"]`); el.focus(); try{ el.setSelectionRange(pos,pos); }catch(_){} return; }
+  if (IDS.includes(e.target.id)) render();
+});
+$('reset').onclick = () => { IDS.forEach(id => $(id).value = DEF[id]); horas = TAREAS.map(t => t[2]); render(); };
+try{ const s = JSON.parse(localStorage.getItem(LS)); if (s) { IDS.forEach(id => { if (s.vals?.[id] !== undefined) $(id).value = s.vals[id]; }); if (Array.isArray(s.horas) && s.horas.length === TAREAS.length) horas = s.horas; } }catch(e){}
+render();
+</script>
