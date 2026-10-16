@@ -224,6 +224,17 @@ const SECS = [
   {id:'alr_inv', t:'¿Hacen conteos de inventario?', o:['Cíclicos (por sector)','Anual','No']},
   {id:'alr_resp', t:'¿Cada control tiene un responsable asignado?', o:['Sí','Algunos','No']},
  ]},
+ {id:'base', t:'Línea de base (datos)', qs:[
+  {id:'base_exact', t:'Exactitud de inventario: % de coincidencia entre conteo y sistema', x:'Ej.: 92% (conteo de 50 productos al azar)'},
+  {id:'base_err', t:'Errores de armado o reclamos por mes', x:'Ej.: 15 reclamos / mes'},
+  {id:'base_falt', t:'Pedidos incompletos por falta de stock (por mes)', x:'Ej.: 8% de los pedidos'},
+  {id:'base_venc', t:'Stock vencido o sin movimiento en 6 meses', x:'Ej.: 120 productos / $ si se conoce'},
+  {id:'base_cobro', t:'Plazo promedio de cobro (días)', x:'Ej.: 45 días'},
+  {id:'base_deuda', t:'Deuda de clientes vencida a más de 60 días', x:'Ej.: 12% de la cartera'},
+  {id:'base_cierre', t:'Días que lleva el cierre mensual', x:'Ej.: 12 días'},
+  {id:'base_horas', t:'Horas por semana en controles manuales, por sector', x:'Ej.: depósito 10 h, administración 15 h'},
+  {id:'base_costos', t:'Datos de costo disponibles (costo hora, costo de un error, inversión)', x:'Lo que se consiga; si no hay, dejar "sin dato"'},
+ ]},
  {id:'inf', t:'Infraestructura', qs:[
   {id:'inf_pc_prod', t:'¿Hay PC o tablet en producción?', o:['Sí','No']},
   {id:'inf_pc_dep', t:'¿Hay PC o tablet en el depósito?', o:['Sí','No']},
@@ -454,6 +465,10 @@ function plan(sec){
     else if (val('alr_inv')) { F.push('Conteos cíclicos'); act('Conteos cíclicos con lector: productos A cada mes, B cada trimestre, C cada semestre', 2); }
     if (has('alr_resp','Sí')) T.push('Responsables asignados'); else if (val('alr_resp')) act('Asignar responsable y plazo de respuesta a cada alerta', 1);
     break; }
+  case 'base': {
+    SECS.find(x => x.id==='base').qs.forEach(q => { const v = val(q.id); (v && v !== NS ? T : F).push(v && v !== NS ? q.t.split(':')[0].split('(')[0].trim() + ': ' + v : q.t.split(':')[0].split('(')[0].trim()); });
+    X.push({t:'Volver a medir estos mismos números al cierre de cada etapa', f:1});
+    break; }
   case 'dash': {
     const k = val('dash_kpi') || []; if (val('dash_rep')) T.push('Reportes actuales: ' + val('dash_rep'));
     const api = val('sis_api');
@@ -491,7 +506,7 @@ function diag([, id, pos, neg]){
 }
 
 // ================= PRESENTACIÓN =================
-const AREAS = [['erp','Sistema: seguir con Itrix o cambiar'],['prod','Productos y códigos'],['etq','Plan de etiquetado'],['log','Logística y depósito'],['aut','Sistema de autorizaciones'],['adm','Automatizaciones en administración'],['imp','Compras e importaciones'],['alr','Alertas y controles automáticos'],['dash','Dashboard y reportes']];
+const AREAS = [['base','Línea de base: cómo estamos hoy'],['erp','Sistema: seguir con Itrix o cambiar'],['prod','Productos y códigos'],['etq','Plan de etiquetado'],['log','Logística y depósito'],['aut','Sistema de autorizaciones'],['adm','Automatizaciones en administración'],['imp','Compras e importaciones'],['alr','Alertas y controles automáticos'],['dash','Dashboard y reportes']];
 const NEED = {erp:['erp','sis'], etq:['etq','prod','inf'], log:['log','sis'], aut:['aut','sis'], dash:['dash','sis']};
 const needOf = id => NEED[id] || [id];
 let cur = 0, slides = [];
