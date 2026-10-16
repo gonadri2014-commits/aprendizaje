@@ -224,6 +224,14 @@ const SECS = [
   {id:'alr_inv', t:'¿Hacen conteos de inventario?', o:['Cíclicos (por sector)','Anual','No']},
   {id:'alr_resp', t:'¿Cada control tiene un responsable asignado?', o:['Sí','Algunos','No']},
  ]},
+ {id:'wsp', t:'Canal digital y WhatsApp', qs:[
+  {id:'wsp_web', t:'¿En qué plataforma está la tienda online?', o:['Tiendanube','WooCommerce','Shopify','VTEX','Desarrollo propio',NS]},
+  {id:'wsp_cat', t:'¿Se puede exportar el catálogo con descripción y link de cada producto?', o:['Sí','Parcial','No',NS]},
+  {id:'wsp_tipo', t:'¿Qué WhatsApp usan hoy para clientes?', o:['WhatsApp común','WhatsApp Business (app)','WhatsApp Business API','No usan']},
+  {id:'wsp_vol', t:'¿Cuántas consultas por WhatsApp reciben por día?', o:['Menos de 20','20 a 100','Más de 100',NS]},
+  {id:'wsp_que', t:'¿Qué consultan más?', m:['Buscar un producto','Precio','Stock','Envío','Estado del pedido','Uso del producto']},
+  {id:'wsp_quien', t:'¿Quién responde hoy y en qué horario?', x:'Ej.: 2 vendedores, lunes a viernes de 9 a 17'},
+ ]},
  {id:'base', t:'Línea de base (datos)', qs:[
   {id:'base_exact', t:'Exactitud de inventario: % de coincidencia entre conteo y sistema', x:'Ej.: 92% (conteo de 50 productos al azar)'},
   {id:'base_err', t:'Errores de armado o reclamos por mes', x:'Ej.: 15 reclamos / mes'},
@@ -465,6 +473,15 @@ function plan(sec){
     else if (val('alr_inv')) { F.push('Conteos cíclicos'); act('Conteos cíclicos con lector: productos A cada mes, B cada trimestre, C cada semestre', 2); }
     if (has('alr_resp','Sí')) T.push('Responsables asignados'); else if (val('alr_resp')) act('Asignar responsable y plazo de respuesta a cada alerta', 1);
     break; }
+  case 'wsp': {
+    if (has('wsp_cat','Sí')) T.push('Catálogo exportable con links'); else if (val('wsp_cat')) { F.push('Catálogo con descripción y link'); act('Armar el catálogo para el bot: código, nombre, descripción, palabras clave y link', 1); }
+    if (has('wsp_tipo','WhatsApp Business API')) T.push('WhatsApp Business API'); else if (val('wsp_tipo')) { F.push('WhatsApp Business API'); act('Contratar WhatsApp Business API con un proveedor oficial', 2); }
+    const w = val('wsp_web'); if (w && w !== NS) T.push('Tienda: ' + w);
+    const q = val('wsp_que') || []; if (q.length) T.push('Consultan: ' + q.join(', '));
+    act('Piloto del asistente de catálogo con una familia de productos', 2);
+    if (q.includes('Stock') || q.includes('Precio')) act('Sumar precio y stock en línea al asistente', 3);
+    if (q.includes('Estado del pedido')) act('Consulta automática del estado del pedido por WhatsApp', 3);
+    break; }
   case 'base': {
     SECS.find(x => x.id==='base').qs.forEach(q => { const v = val(q.id); (v && v !== NS ? T : F).push(v && v !== NS ? q.t.split(':')[0].split('(')[0].trim() + ': ' + v : q.t.split(':')[0].split('(')[0].trim()); });
     X.push({t:'Volver a medir estos mismos números al cierre de cada etapa', f:1});
@@ -506,7 +523,7 @@ function diag([, id, pos, neg]){
 }
 
 // ================= PRESENTACIÓN =================
-const AREAS = [['base','Línea de base: cómo estamos hoy'],['erp','Sistema: seguir con Itrix o cambiar'],['prod','Productos y códigos'],['etq','Plan de etiquetado'],['log','Logística y depósito'],['aut','Sistema de autorizaciones'],['adm','Automatizaciones en administración'],['imp','Compras e importaciones'],['alr','Alertas y controles automáticos'],['dash','Dashboard y reportes']];
+const AREAS = [['base','Línea de base: cómo estamos hoy'],['erp','Sistema: seguir con Itrix o cambiar'],['prod','Productos y códigos'],['etq','Plan de etiquetado'],['log','Logística y depósito'],['aut','Sistema de autorizaciones'],['adm','Automatizaciones en administración'],['imp','Compras e importaciones'],['alr','Alertas y controles automáticos'],['wsp','Asistente de catálogo por WhatsApp'],['dash','Dashboard y reportes']];
 const NEED = {erp:['erp','sis'], etq:['etq','prod','inf'], log:['log','sis'], aut:['aut','sis'], dash:['dash','sis']};
 const needOf = id => NEED[id] || [id];
 let cur = 0, slides = [];
