@@ -77,6 +77,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
         <div class="miss" id="miss"><span style="background:transparent;color:var(--muted)">Ninguna todavía</span></div>
       </div>
       <div class="card">
+        <h2>Cargar el catálogo real</h2>
+        <p class="note">Pegá una planilla con columnas <code>nombre;categoria;palabras_clave;link</code> (separador ; o ,). Reemplaza el catálogo de ejemplo.</p>
+        <textarea id="csv" style="width:100%;min-height:110px;font:inherit;font-size:.8rem;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg)" placeholder="nombre;categoria;palabras_clave;link"></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="chip" id="load" type="button">Cargar catálogo</button><button class="chip" id="reset" type="button">Volver al ejemplo</button><span class="note" id="cat-n"></span></div>
+      </div>
+      <div class="card">
         <h2>Cómo funciona</h2>
         <ul>
           <li>Entiende términos técnicos y sinónimos: <i>composite</i>, <i>bonding</i>, <i>endo</i>, <i>bioseguridad</i>.</li>
@@ -92,7 +98,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 
 <script>
 const BASE = 'https://tienda.ejemplo/producto/';
-const CAT = [
+const SAMPLE_CAT = [
  ['Resina compuesta fotocurable A2', 'Restauración', 'resina composite restauracion estetica fotocurable a2 posterior anterior'],
  ['Resina compuesta fotocurable A3', 'Restauración', 'resina composite restauracion estetica fotocurable a3 posterior'],
  ['Resina fluida (flow) A2', 'Restauración', 'resina flow fluida composite a2 base cavidad'],
@@ -119,6 +125,13 @@ const CAT = [
  ['Sellador de fosas y fisuras', 'Prevención', 'sellador fosas fisuras prevencion caries infantil'],
  ['Discos de pulido surtidos', 'Terminación', 'discos pulido terminacion resina'],
 ].map(([n,c,k],i) => ({id:i, name:n, cat:c, kw:k, url: BASE + n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}));
+let CAT = SAMPLE_CAT;
+function parseCat(txt){
+  const L = txt.trim().split(/\r?\n/).filter(Boolean); if (!L.length) return [];
+  const sep = L[0].includes(';') ? ';' : ',';
+  return L.map(l => l.split(sep).map(x => x.trim())).filter(r => r[0] && !/^nombre$/i.test(r[0]))
+    .map((r,i) => ({id:i, name:r[0], cat:r[1]||'', kw:r[2]||'', url:r[3]||''}));
+}
 
 // sinónimos: término del cliente -> términos del catálogo
 const SYN = {
@@ -167,7 +180,7 @@ function reply(q){
     add('No encontré ese producto en el catálogo. ¿Me das otro nombre o para qué lo usás? Si preferís, escribí <b>vendedor</b> y te atiende una persona.', 'in');
   } else {
     stats.ok++;
-    add('Te sugiero estas opciones:' + res.map(p => `<span class="p"><b>${esc(p.name)}</b> · ${esc(p.cat)}<br><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.url)}</a></span>`).join('') + '<span class="p">¿Te sirve alguno o busco otra cosa?</span>', 'in');
+    add('Te sugiero estas opciones:' + res.map(p => `<span class="p"><b>${esc(p.name)}</b> · ${esc(p.cat)}${/^https?:\/\//.test(p.url) ? `<br><a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.url)}</a>` : ''}</span>`).join('') + '<span class="p">¿Te sirve alguno o busco otra cosa?</span>', 'in');
   }
   renderStats();
 }
@@ -180,5 +193,10 @@ $('f').addEventListener('submit', e => { e.preventDefault(); send($('q').value);
 const EJ = ['busco composite A2', 'algo para endo', 'bonding', 'material para impresiones', 'bioseguridad', 'fresas para turbina', 'implantes'];
 $('chips').innerHTML = EJ.map(t => `<button class="chip" type="button">${esc(t)}</button>`).join('');
 $('chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) send(b.textContent); });
+try{ const saved = localStorage.getItem('bot-cat'); if (saved) { const c = parseCat(saved); if (c.length) { CAT = c; document.getElementById('csv').value = saved; } } }catch(e){}
+function showN(){ document.getElementById('cat-n').textContent = (CAT === SAMPLE_CAT ? 'Catálogo de ejemplo: ' : 'Catálogo cargado: ') + CAT.length + ' productos'; document.querySelector('.ex').hidden = CAT !== SAMPLE_CAT; }
+document.getElementById('load').onclick = () => { const c = parseCat(document.getElementById('csv').value); if (!c.length) return; CAT = c; try{ localStorage.setItem('bot-cat', document.getElementById('csv').value); }catch(e){} showN(); };
+document.getElementById('reset').onclick = () => { CAT = SAMPLE_CAT; try{ localStorage.removeItem('bot-cat'); }catch(e){} document.getElementById('csv').value=''; showN(); };
+showN();
 add('¡Hola! Soy el asistente de catálogo de Dental Medrano. Escribí lo que buscás (por ejemplo "resina A2" o "algo para endodoncia") y te paso opciones con el link.', 'in');
 </script>
