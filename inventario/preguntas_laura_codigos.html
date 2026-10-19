@@ -62,7 +62,7 @@ button.b:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
   <header>
     <p class="eyebrow">Etapa 1 · Relevamiento con Gerencia</p>
     <h1>Código de barras y orden de depósito</h1>
-    <p class="lead">Preguntas y solicitudes para la reunión con Laura y Liliana. Los bloques de Itrix definen qué se puede hacer dentro del sistema y qué se desarrolla aparte. Las respuestas se guardan solas mientras escribís.</p>
+    <p class="lead">Preguntas y solicitudes para la reunión con Laura y Liliana. Alcance: solo el proyecto de código de barras (producto + lote). Permisos y demás se relevan al terminarlo. Las respuestas se guardan solas mientras escribís.</p>
     <div class="progress"><div class="bar"><i id="bar"></i></div><span id="prog">0 de 0</span></div>
     <nav id="nav"></nav>
   </header>
@@ -123,16 +123,13 @@ const BLOCKS = [
   {id:'i7', t:'¿Maneja lotes y vencimientos por producto? ¿Se usa hoy?', type:'chips', opts:['Sí, se usa','Lo tiene, no se usa','No lo tiene','No sé']},
   {id:'i8', t:'¿Maneja ubicaciones de depósito (pasillo, estante, nivel)?', type:'chips', opts:['Sí, se usa','Lo tiene, no se usa','No lo tiene','No sé']},
   {id:'i9', t:'¿Permite asignar código de barras (EAN o interno) a cada producto?', type:'chips', opts:OPT_SN},
+  {id:'i9b', t:'Formato propuesto: código interno (240) + lote (10) en GS1-128. ¿Se aprueba?', type:'chips', opts:['Sí','Con cambios','No'], hint:'Sin alta en GS1. Opcional: sumar vencimiento (17) si Itrix no lo toma del lote.'},
   {id:'i10', t:'¿Acepta lectura con lector de código de barras en remitos, ingresos y pedidos?', type:'chips', opts:OPT_SN},
   {id:'i11', t:'¿Puede leer un código GS1-128 o DataMatrix que traiga producto + lote juntos?', type:'chips', opts:OPT_SN},
   {id:'i12', t:'¿Tiene app o versión para colectoras o celulares en el depósito?', type:'chips', opts:OPT_SN},
   {id:'i13', t:'¿Tiene órdenes de producción y transferencias entre depósitos?', type:'chips', opts:['Ambas','Solo producción','Solo transferencias','Ninguna','No sé']},
   {id:'i14', t:'¿Puede imprimir etiquetas con código de barras desde el sistema?', type:'chips', opts:OPT_SN},
   {id:'i15', t:'¿Sugiere el lote a despachar por vencimiento (FEFO)?', type:'chips', opts:OPT_SN}]},
- {id:'itx3', t:'Itrix: permisos y aprobaciones', qs:[
-  {id:'i16', t:'¿Se pueden armar perfiles por puesto (qué ve y qué puede hacer cada usuario)?', type:'chips', opts:OPT_SN},
-  {id:'i17', t:'¿Tiene circuito de aprobaciones (descuentos, notas de crédito, compras, ajustes de stock)?', type:'chips', opts:OPT_SN},
-  {id:'i18', t:'¿Guarda registro de quién hizo cada cambio y cuándo (auditoría)?', type:'chips', opts:OPT_SN}]},
  {id:'itx4', t:'Itrix: datos, formatos e integraciones', qs:[
   {id:'i19', t:'¿En qué formatos exporta?', type:'multi', opts:['Excel','CSV','TXT','XML','PDF','No exporta']},
   {id:'i20', t:'¿Permite importar datos masivos (productos, ubicaciones, stock)? ¿En qué formato?', type:'text'},
