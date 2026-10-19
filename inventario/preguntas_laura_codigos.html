@@ -62,7 +62,7 @@ button.b:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
   <header>
     <p class="eyebrow">Etapa 1 · Relevamiento con Gerencia</p>
     <h1>Código de barras y orden de depósito</h1>
-    <p class="lead">Preguntas y solicitudes para la reunión con Laura. Lo de Itrix se ve aparte con Sistemas. Las respuestas se guardan solas mientras escribís.</p>
+    <p class="lead">Preguntas y solicitudes para la reunión con Laura y Liliana. Los bloques de Itrix definen qué se puede hacer dentro del sistema y qué se desarrolla aparte. Las respuestas se guardan solas mientras escribís.</p>
     <div class="progress"><div class="bar"><i id="bar"></i></div><span id="prog">0 de 0</span></div>
     <nav id="nav"></nav>
   </header>
@@ -112,6 +112,42 @@ const BLOCKS = [
   {id:'d8', t:'¿Cuáles son los errores más frecuentes?', type:'multi', opts:['Producto equivocado','Cantidad','Lote','Vencido','Faltante','Otro']},
   {id:'d9', t:'¿Qué se hace con los vencidos y los productos sin movimiento?', type:'text'},
   {id:'d10', t:'¿Quiénes son los referentes de depósito y de producción?', type:'text'}]},
+ {id:'itx1', t:'Itrix: versión, licencias y contrato', qs:[
+  {id:'i1', t:'¿Qué versión de Itrix usan y qué módulos tienen contratados?', type:'multi', opts:['Ventas','Compras','Stock','Producción','Contabilidad','Tesorería','Cuentas corrientes','Sueldos','Otro']},
+  {id:'i2', t:'¿Cuántos usuarios o licencias hay y cuánto se paga por mes?', type:'text'},
+  {id:'i3', t:'¿Dónde corre el sistema?', type:'chips', opts:['Servidor propio','Nube de Itrix','Nube de terceros','No sé']},
+  {id:'i4', t:'¿Hay contrato con permanencia o fecha de renovación?', type:'text'},
+  {id:'i5', t:'¿Quién da soporte (Itrix, un partner, alguien interno) y cuánto tarda en responder?', type:'text'},
+  {id:'i6', t:'¿Hasta dónde se avanzó con Itrix y qué quedó pendiente?', type:'text', hint:'Lo que Laura ya sabe: pedidos hechos, qué se implementó y qué no.'}]},
+ {id:'itx2', t:'Itrix: stock, lotes y códigos', qs:[
+  {id:'i7', t:'¿Maneja lotes y vencimientos por producto? ¿Se usa hoy?', type:'chips', opts:['Sí, se usa','Lo tiene, no se usa','No lo tiene','No sé']},
+  {id:'i8', t:'¿Maneja ubicaciones de depósito (pasillo, estante, nivel)?', type:'chips', opts:['Sí, se usa','Lo tiene, no se usa','No lo tiene','No sé']},
+  {id:'i9', t:'¿Permite asignar código de barras (EAN o interno) a cada producto?', type:'chips', opts:OPT_SN},
+  {id:'i10', t:'¿Acepta lectura con lector de código de barras en remitos, ingresos y pedidos?', type:'chips', opts:OPT_SN},
+  {id:'i11', t:'¿Puede leer un código GS1-128 o DataMatrix que traiga producto + lote juntos?', type:'chips', opts:OPT_SN},
+  {id:'i12', t:'¿Tiene app o versión para colectoras o celulares en el depósito?', type:'chips', opts:OPT_SN},
+  {id:'i13', t:'¿Tiene órdenes de producción y transferencias entre depósitos?', type:'chips', opts:['Ambas','Solo producción','Solo transferencias','Ninguna','No sé']},
+  {id:'i14', t:'¿Puede imprimir etiquetas con código de barras desde el sistema?', type:'chips', opts:OPT_SN},
+  {id:'i15', t:'¿Sugiere el lote a despachar por vencimiento (FEFO)?', type:'chips', opts:OPT_SN}]},
+ {id:'itx3', t:'Itrix: permisos y aprobaciones', qs:[
+  {id:'i16', t:'¿Se pueden armar perfiles por puesto (qué ve y qué puede hacer cada usuario)?', type:'chips', opts:OPT_SN},
+  {id:'i17', t:'¿Tiene circuito de aprobaciones (descuentos, notas de crédito, compras, ajustes de stock)?', type:'chips', opts:OPT_SN},
+  {id:'i18', t:'¿Guarda registro de quién hizo cada cambio y cuándo (auditoría)?', type:'chips', opts:OPT_SN}]},
+ {id:'itx4', t:'Itrix: datos, formatos e integraciones', qs:[
+  {id:'i19', t:'¿En qué formatos exporta?', type:'multi', opts:['Excel','CSV','TXT','XML','PDF','No exporta']},
+  {id:'i20', t:'¿Permite importar datos masivos (productos, ubicaciones, stock)? ¿En qué formato?', type:'text'},
+  {id:'i21', t:'¿Tiene API o web service para conectar otras herramientas?', type:'chips', opts:['API REST','Web service SOAP','No tiene','No sé']},
+  {id:'i22', t:'¿Qué base de datos usa y se puede consultar directo (solo lectura)?', type:'chips', opts:['SQL Server','MySQL','PostgreSQL','Otra','No sé'], hint:'Clave para el tablero: una conexión de solo lectura evita exportar a mano.'}, 
+  {id:'i23', t:'¿Se pueden programar exportaciones automáticas (diarias o semanales)?', type:'chips', opts:OPT_SN},
+  {id:'i24', t:'¿Tiene generador de reportes propio? ¿Quién arma los reportes nuevos?', type:'text'},
+  {id:'i25', t:'¿Está integrado con la web, bancos o facturación electrónica (ARCA)?', type:'multi', opts:['Web / e-commerce','Bancos','Facturación electrónica','Mercado Pago','Ninguno']},
+  {id:'i26', t:'¿Los datos son de la empresa y se pueden exportar completos si un día se cambia de sistema?', type:'chips', opts:OPT_SN},
+  {id:'i27', t:'¿Cómo y cada cuánto se hace el backup?', type:'text'}]},
+ {id:'itx5', t:'Itrix: desarrollos a medida', qs:[
+  {id:'i28', t:'¿Itrix hace desarrollos o cambios a pedido? ¿Cuánto cuestan y cuánto tardan?', type:'text'},
+  {id:'i29', t:'¿Qué se pidió antes y no se pudo hacer? ¿Por qué?', type:'text'},
+  {id:'i30', t:'¿Permiten que un tercero o nosotros desarrollemos conectores sobre sus datos?', type:'chips', opts:['Sí','Con condiciones','No','No sé']},
+  {id:'i31', t:'¿Qué nivel de conformidad hay con el sistema?', type:'chips', opts:['Alto','Medio','Bajo']}]},
  {id:'sol', t:'Solicitudes', req:true, qs:[
   {id:'s0', t:'Usuario o permiso en el sistema para exportar maestro, stock y lotes (solo consulta)'},
   {id:'s1', t:'Maestro de productos: código, descripción, categoría y si lleva lote y vencimiento'},
@@ -123,7 +159,9 @@ const BLOCKS = [
   {id:'s7', t:'Visto bueno para el piloto en productos nacionales'},
   {id:'s8', t:'Presupuesto para lectores y etiquetas'},
   {id:'s9', t:'Errores de armado y reclamos de los últimos 6 meses, si hay registro'},
-  {id:'s10', t:'Contacto de Sistemas (nombre, teléfono, mail) y fecha para reunión'}]}
+  {id:'s10', t:'Contacto de Sistemas (nombre, teléfono, mail) y fecha para reunión'},
+  {id:'s11', t:'Manual o documentación de Itrix (módulos, importación, API)'},
+  {id:'s12', t:'Contacto del soporte de Itrix'}]}
 ];
 const REQ_OPTS = ['Pendiente','Pedido','Recibido'];
 const QS = BLOCKS.flatMap(b => b.qs.map(q => ({...q, block:b.id, req:!!b.req})));
