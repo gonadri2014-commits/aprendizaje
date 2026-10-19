@@ -1,0 +1,234 @@
+<title>Relevamiento Laura · Códigos y orden</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: formulario de una columna, bloques por área, barra de estado fija abajo */
+:root{
+  --bg:#F6F7F4; --card:#FFFFFF; --fg:#14302A; --muted:#5E6F69; --line:#DCE3DF;
+  --accent:#1F6F61; --accent-soft:#E3EFEB; --ok:#2E7D4F; --warn:#B7791F;
+  --f-display:'Source Serif 4', Georgia, serif; --f-body:'IBM Plex Sans', Arial, sans-serif; --f-mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1F1B; --card:#162A25; --fg:#E6EFEB; --muted:#9DB3AB; --line:#2A423B;
+  --accent:#7FD1BF; --accent-soft:#1E3B34; --ok:#6FCF97; --warn:#F2C26B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1F1B; --card:#162A25; --fg:#E6EFEB; --muted:#9DB3AB; --line:#2A423B;
+  --accent:#7FD1BF; --accent-soft:#1E3B34; --ok:#6FCF97; --warn:#F2C26B; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:820px;margin:0 auto;padding-block:32px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-family:var(--f-display);font-size:clamp(28px,5vw,40px);line-height:1.15;font-weight:600;text-wrap:balance;margin:0}
+.lead{color:var(--muted);max-width:65ch;margin:0}
+.progress{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+nav{display:flex;flex-wrap:wrap;gap:8px}
+nav a{font-size:14px;color:var(--accent);text-decoration:none;border:1px solid var(--line);padding:4px 12px;border-radius:999px;background:var(--card)}
+nav a:hover,nav a:focus-visible{border-color:var(--accent)}
+section{display:flex;flex-direction:column;gap:14px}
+h2{font-family:var(--f-display);font-size:24px;font-weight:600;margin:0;display:flex;align-items:baseline;gap:10px}
+h2 small{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-weight:500}
+.q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.q.done{border-left:4px solid var(--ok);padding-left:15px}
+.q label.t{font-weight:500}
+.q .hint{font-size:13px;color:var(--muted);margin-top:-6px}
+textarea,input[type=text],input[type=number]{width:100%;box-sizing:border-box;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{min-height:64px;resize:vertical}
+textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:5px 14px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--card)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.nota{font-size:14px}
+.req{display:grid;grid-template-columns:1fr auto;gap:10px 14px;align-items:center}
+.req .txt{min-width:0}
+.req .chips{justify-content:flex-end}
+.req .nota{grid-column:1/-1}
+.st-Recibido{color:var(--ok)} .st-Pedido{color:var(--warn)}
+.foot{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.foot .in{max-width:820px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+#status{font-size:13px;color:var(--muted)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button.b{font:inherit;font-size:14px;font-weight:500;border-radius:8px;padding:8px 14px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--card)}
+button.b.sec{background:transparent;color:var(--accent)}
+button.b:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+#out{display:none}
+@media (max-width:520px){.req{grid-template-columns:1fr}.req .chips{justify-content:flex-start}}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Etapa 1 · Relevamiento con Gerencia</p>
+    <h1>Código de barras y orden de depósito</h1>
+    <p class="lead">Preguntas y solicitudes para la reunión con Laura. Lo de Itrix se ve aparte con Sistemas. Las respuestas se guardan solas mientras escribís.</p>
+    <div class="progress"><div class="bar"><i id="bar"></i></div><span id="prog">0 de 0</span></div>
+    <nav id="nav"></nav>
+  </header>
+  <form id="form" autocomplete="off"></form>
+  <textarea id="out" aria-hidden="true" tabindex="-1"></textarea>
+</div>
+<div class="foot"><div class="in">
+  <span id="status">Guardado en este navegador</span>
+  <div class="btns">
+    <button type="button" class="b sec" id="copy">Copiar respuestas</button>
+    <button type="button" class="b" id="dl">Descargar archivo</button>
+  </div>
+</div></div>
+
+<script>
+const OPT_SN = ['Sí','No','No sé'];
+const BLOCKS = [
+ {id:'pri', t:'Prioridades', qs:[
+  {id:'p1', t:'¿Qué es lo más urgente para ordenar en el depósito?', type:'text'},
+  {id:'p2', t:'¿Hubo intentos anteriores con código de barras u orden de depósito? ¿Por qué no avanzaron?', type:'text'},
+  {id:'p3', t:'¿Cómo querés validar los avances?', type:'chips', opts:['Reunión semanal','Por mail','Por WhatsApp','Otro']},
+  {id:'p4', t:'¿Hay presupuesto para equipos (lectores, etiquetas)? ¿Quién lo aprueba?', type:'text'}]},
+ {id:'cod', t:'Productos y códigos', qs:[
+  {id:'c1', t:'¿Hay un maestro de productos con código interno actualizado?', type:'chips', opts:['Sí','Parcial','No']},
+  {id:'c2', t:'¿Cuántos productos (SKUs) activos hay?', type:'num'},
+  {id:'c3', t:'¿Qué productos son de fabricación propia y cuáles de reventa?', type:'text'},
+  {id:'c4', t:'¿Los productos de reventa ya traen código de barras del fabricante?', type:'chips', opts:['Sí','Algunos','No','No sé']},
+  {id:'c5', t:'¿Venden a cadenas o distribuidores que exijan código EAN?', type:'chips', opts:OPT_SN},
+  {id:'c6', t:'¿La empresa está dada de alta en GS1?', type:'chips', opts:OPT_SN},
+  {id:'c7', t:'¿Todos los productos manejan lote y vencimiento?', type:'chips', opts:['Todos','Algunos','Ninguno'], hint:'Si son algunos, anotar cuáles.'}]},
+ {id:'etq', t:'Producción y etiquetado', qs:[
+  {id:'e1', t:'¿Qué datos lleva hoy la etiqueta?', type:'multi', opts:['Producto','Código interno','Lote','Vencimiento','Fecha de fabricación','Datos ANMAT','Otro']},
+  {id:'e2', t:'¿Quién emite la etiqueta y con qué programa?', type:'text'},
+  {id:'e3', t:'¿Qué marca y modelo es la impresora de etiquetas?', type:'text'},
+  {id:'e4', t:'¿Cuántos lotes se producen por semana?', type:'num'},
+  {id:'e5', t:'¿Cómo pasa hoy la mercadería de producción a logística? ¿Con qué papel o registro?', type:'text'},
+  {id:'e6', t:'¿Usan caja master o bultos con varias unidades?', type:'chips', opts:OPT_SN},
+  {id:'e7', t:'¿Estás de acuerdo con sumar el código de barras (producto + lote) a la etiqueta actual?', type:'chips', opts:['Sí','Con cambios','No'], hint:'La etiqueta la sigue pegando producción; solo se agrega el código.'}]},
+ {id:'dep', t:'Depósito y orden', qs:[
+  {id:'d1', t:'¿Las ubicaciones están definidas y señalizadas?', type:'chips', opts:['Sí','Parcial','No']},
+  {id:'d2', t:'¿Cada cuánto se cuenta el stock?', type:'chips', opts:['Nunca','Anual','Mensual','Cíclico','Otro']},
+  {id:'d3', t:'¿Qué diferencias de stock suelen aparecer?', type:'text'},
+  {id:'d4', t:'¿Hay lectores o colectoras? ¿Cuántos?', type:'text'},
+  {id:'d5', t:'¿Hay WiFi en todo el depósito?', type:'chips', opts:['Sí','Parcial','No','No sé']},
+  {id:'d6', t:'¿Cómo se arma hoy un pedido?', type:'text'},
+  {id:'d7', t:'¿Cuántos pedidos salen por día?', type:'num'},
+  {id:'d8', t:'¿Cuáles son los errores más frecuentes?', type:'multi', opts:['Producto equivocado','Cantidad','Lote','Vencido','Faltante','Otro']},
+  {id:'d9', t:'¿Qué se hace con los vencidos y los productos sin movimiento?', type:'text'},
+  {id:'d10', t:'¿Quiénes son los referentes de depósito y de producción?', type:'text'}]},
+ {id:'sol', t:'Solicitudes', req:true, qs:[
+  {id:'s1', t:'Maestro de productos: código, descripción, categoría y si lleva lote y vencimiento'},
+  {id:'s2', t:'Stock actual por producto, lote y ubicación'},
+  {id:'s3', t:'Plano o croquis del depósito'},
+  {id:'s4', t:'Foto de la etiqueta actual y de la impresora'},
+  {id:'s5', t:'Nombre del programa de etiquetas y modelo de la impresora'},
+  {id:'s6', t:'Referente de producción y de depósito para el proyecto'},
+  {id:'s7', t:'Visto bueno para el piloto en productos nacionales'},
+  {id:'s8', t:'Presupuesto para lectores y etiquetas'},
+  {id:'s9', t:'Errores de armado y reclamos de los últimos 6 meses, si hay registro'}]}
+];
+const REQ_OPTS = ['Pendiente','Pedido','Recibido'];
+const QS = BLOCKS.flatMap(b => b.qs.map(q => ({...q, block:b.id, req:!!b.req})));
+const COL = 'laura_codigos', LS = 'laura_codigos_v1';
+let A = {}, db = null, canWrite = true;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function buildForm(){
+  $('#nav').innerHTML = BLOCKS.map(b => `<a href="#${b.id}">${esc(b.t)}</a>`).join('');
+  $('#form').innerHTML = BLOCKS.map(b => `<section id="${b.id}"><h2>${esc(b.t)} <small>${b.qs.length}</small></h2>${b.qs.map(q => qHtml(q, b.req)).join('')}</section>`).join('');
+  document.querySelectorAll('.chip').forEach(el => el.addEventListener('click', onChip));
+  document.querySelectorAll('[data-in]').forEach(el => el.addEventListener('input', onInput));
+}
+function qHtml(q, req){
+  const chips = (opts) => `<div class="chips" role="group" aria-label="${esc(q.t)}">${opts.map(o => `<button type="button" class="chip" data-q="${q.id}" data-o="${esc(o)}" aria-pressed="false">${esc(o)}</button>`).join('')}</div>`;
+  if (req) return `<div class="q req" id="q_${q.id}"><div class="txt"><span class="t">${esc(q.t)}</span></div>${chips(REQ_OPTS)}<input type="text" class="nota" id="n_${q.id}" data-in="nota" data-q="${q.id}" placeholder="Nota (fecha, quién lo pasa, formato…)"></div>`;
+  let input = '';
+  if (q.type === 'text') input = `<textarea id="v_${q.id}" data-in="v" data-q="${q.id}"></textarea>`;
+  else if (q.type === 'num') input = `<input type="number" min="0" id="v_${q.id}" data-in="v" data-q="${q.id}" style="max-width:180px">`;
+  else input = chips(q.opts);
+  const nota = q.type === 'chips' || q.type === 'multi' ? `<input type="text" class="nota" id="n_${q.id}" data-in="nota" data-q="${q.id}" placeholder="Comentario (opcional)">` : '';
+  return `<div class="q" id="q_${q.id}"><label class="t" for="v_${q.id}">${esc(q.t)}</label>${q.hint?`<p class="hint">${esc(q.hint)}</p>`:''}${input}${nota}</div>`;
+}
+function onChip(e){
+  const id = e.currentTarget.dataset.q, o = e.currentTarget.dataset.o, q = QS.find(x => x.id === id);
+  if (!canWrite) return;
+  let v = A[id]?.v;
+  if (q.type === 'multi'){ v = Array.isArray(v) ? [...v] : []; v = v.includes(o) ? v.filter(x => x !== o) : [...v, o]; }
+  else v = v === o ? '' : o;
+  setAnswer(id, {v});
+}
+const timers = {};
+function onInput(e){
+  const el = e.currentTarget, id = el.dataset.q, k = el.dataset.in;
+  A[id] = {...(A[id]||{}), [k]: el.value, at:new Date().toISOString()};
+  refreshQ(id, true); refreshProgress(); saveLocal();
+  clearTimeout(timers[id]); timers[id] = setTimeout(() => persist(id), 600);
+}
+function setAnswer(id, patch){ A[id] = {...(A[id]||{}), ...patch, at:new Date().toISOString()}; refreshQ(id); refreshProgress(); persist(id); }
+const isEmpty = v => v == null || v === '' || (Array.isArray(v) && !v.length);
+const answered = q => q.req ? (A[q.id]?.v && A[q.id].v !== 'Pendiente') : !isEmpty(A[q.id]?.v);
+function refreshQ(id, skipInputs){
+  const a = A[id] || {}, box = $('#q_' + id); if (!box) return;
+  box.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', Array.isArray(a.v) ? a.v.includes(c.dataset.o) : a.v === c.dataset.o));
+  if (!skipInputs){
+    const v = $('#v_' + id); if (v && document.activeElement !== v) v.value = a.v ?? '';
+    const n = $('#n_' + id); if (n && document.activeElement !== n) n.value = a.nota ?? '';
+  }
+  box.classList.toggle('done', !!answered(QS.find(q => q.id === id)));
+}
+function refreshProgress(){
+  const n = QS.filter(answered).length;
+  $('#prog').textContent = `${n} de ${QS.length}`; $('#bar').style.width = (100*n/QS.length) + '%';
+}
+function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify(A)); }catch(e){} }
+function loadLocal(){ try{ A = JSON.parse(localStorage.getItem(LS) || '{}') || {}; }catch(e){ A = {}; } }
+const setStatus = t => { $('#status').textContent = t; };
+const pending = new Map();
+async function persist(id){
+  saveLocal();
+  if (!db || !canWrite) return;
+  if (pending.get(id)) { pending.set(id, 'again'); return; }
+  pending.set(id, true); setStatus('Guardando…');
+  try{
+    do { if (pending.get(id) === 'again') pending.set(id, true);
+      const a = A[id]; const ref = db.collection(COL).doc(id);
+      if (!a || (isEmpty(a.v) && !a.nota)) await ref.delete(); else await ref.set({v:a.v ?? '', nota:a.nota || '', at:a.at});
+    } while (pending.get(id) === 'again');
+    setStatus('Guardado');
+  }catch(e){ setStatus('No se pudo guardar en línea. Queda en este navegador.'); }
+  finally { pending.delete(id); }
+}
+function toMarkdown(){
+  const fmt = v => Array.isArray(v) ? v.join(', ') : (v ?? '');
+  let s = `# Relevamiento con Laura: código de barras y orden\n\nFecha: ${new Date().toLocaleDateString('es-AR')}\n`;
+  BLOCKS.forEach(b => {
+    s += `\n## ${b.t}\n\n`;
+    b.qs.forEach(q => { const a = A[q.id] || {};
+      s += b.req ? `- [${a.v === 'Recibido' ? 'x' : ' '}] ${q.t} · ${a.v || 'Pendiente'}${a.nota ? ' · ' + a.nota : ''}\n`
+                 : `**${q.t}**\n${fmt(a.v) || '_sin respuesta_'}${a.nota ? `\n_Comentario:_ ${a.nota}` : ''}\n\n`; });
+  });
+  return s;
+}
+$('#copy').addEventListener('click', () => {
+  const t = toMarkdown();
+  navigator.clipboard.writeText(t).then(() => setStatus('Respuestas copiadas'), () => {
+    const o = $('#out'); o.style.display = 'block'; o.value = t; o.select(); setStatus('Seleccionado: copialo con Ctrl+C');
+  });
+});
+$('#dl').addEventListener('click', async () => {
+  const d = await window.claude?.use?.('downloads');
+  if (!d){ setStatus('Descarga no disponible: usá "Copiar respuestas"'); return; }
+  try{ await d.save({filename:'respuestas_laura_codigos.md', data:toMarkdown()}); setStatus('Archivo descargado'); }
+  catch(e){ setStatus('Descarga cancelada'); }
+});
+
+buildForm(); loadLocal(); QS.forEach(q => refreshQ(q.id)); refreshProgress();
+(async () => {
+  try{
+    db = await window.claude?.use?.('db');
+    if (!db) return;
+    setStatus('Conectado · se guarda automáticamente');
+    db.collection(COL).onSnapshot(snap => {
+      snap.docs.forEach(d => { if (pending.has(d.id) || timers[d.id] && document.activeElement?.dataset?.q === d.id) return; const x = d.data(); A[d.id] = {v:x.v, nota:x.nota || '', at:x.at}; });
+      saveLocal(); QS.forEach(q => refreshQ(q.id)); refreshProgress();
+    }, () => setStatus('Sin conexión: se guarda en este navegador'));
+  }catch(e){ db = null; }
+})();
+</script>
