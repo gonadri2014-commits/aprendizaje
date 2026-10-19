@@ -113,6 +113,7 @@ const BLOCKS = [
   {id:'d9', t:'¿Qué se hace con los vencidos y los productos sin movimiento?', type:'text'},
   {id:'d10', t:'¿Quiénes son los referentes de depósito y de producción?', type:'text'}]},
  {id:'sol', t:'Solicitudes', req:true, qs:[
+  {id:'s0', t:'Usuario o permiso en el sistema para exportar maestro, stock y lotes (solo consulta)'},
   {id:'s1', t:'Maestro de productos: código, descripción, categoría y si lleva lote y vencimiento'},
   {id:'s2', t:'Stock actual por producto, lote y ubicación'},
   {id:'s3', t:'Plano o croquis del depósito'},
@@ -121,7 +122,8 @@ const BLOCKS = [
   {id:'s6', t:'Referente de producción y de depósito para el proyecto'},
   {id:'s7', t:'Visto bueno para el piloto en productos nacionales'},
   {id:'s8', t:'Presupuesto para lectores y etiquetas'},
-  {id:'s9', t:'Errores de armado y reclamos de los últimos 6 meses, si hay registro'}]}
+  {id:'s9', t:'Errores de armado y reclamos de los últimos 6 meses, si hay registro'},
+  {id:'s10', t:'Contacto de Sistemas (nombre, teléfono, mail) y fecha para reunión'}]}
 ];
 const REQ_OPTS = ['Pendiente','Pedido','Recibido'];
 const QS = BLOCKS.flatMap(b => b.qs.map(q => ({...q, block:b.id, req:!!b.req})));
