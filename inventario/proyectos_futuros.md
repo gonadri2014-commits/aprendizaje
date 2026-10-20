@@ -1,5 +1,43 @@
 # Proyectos futuros (backlog)
 
+## Visión del proyecto integral: empresa sin papel
+
+**Objetivo:** que cada operación quede registrada en el sistema, sea trazable y se pueda medir. El papel deja de ser el control.
+
+Se hace por etapas. Cada papel se reemplaza recién cuando su versión digital está probada.
+
+### Mapa de papeles a digitalizar (a confirmar con el censo)
+
+| Proceso | Papel hoy (supuesto) | Reemplazo digital | Proyecto |
+|---|---|---|---|
+| Ingreso de producción a depósito | Planilla o remito interno | Escaneo de código de barras (producto + lote) | 1 |
+| Ubicación y búsqueda de productos | Memoria o listados | Ubicación en el sistema | 1 |
+| Armado de pedidos | Pedido impreso | QR del pedido + validación por escaneo | B |
+| Conteos de inventario | Planilla en papel | Conteo cíclico con lector | 1 / A |
+| Recepción de proveedores e importaciones | Remito del proveedor tildado a mano | Recepción por escaneo contra la orden de compra | A |
+| Entrega al cliente | Remito firmado en papel | Remito digital con firma y DNI | C |
+| Autorizaciones (descuentos, notas de crédito, compras, ajustes) | Firma o visto bueno verbal | Aprobación en el sistema con registro | D |
+| Cobranzas y recibos | Recibo manual | Recibo emitido por el sistema | E |
+| Órdenes de pago y caja chica | Planilla o comprobante en papel | Flujo de aprobación + comprobante escaneado | E |
+| Reclamos y devoluciones | Nota o mail suelto | Registro con lote, motivo y estado | B / E |
+| Archivo de comprobantes | Biblioteca o caja | Archivo digital indexado | E |
+
+> Excluir o validar aparte los registros regulatorios (lotes de producción, ANMAT): puede que deban seguir el formato exigido.
+
+### Qué falta para la presentación final
+
+1. **Censo de papeles:** qué formulario, quién lo usa, cuántos por mes, dónde se archiva y para qué se consulta.
+2. **Línea de base:** hojas por mes, horas de carga y búsqueda, errores y extravíos.
+3. **Priorización:** impacto contra esfuerzo de cada papel. Arrancar por los que más se usan y más errores generan.
+4. **Requisitos:**
+   - Equipos: celulares o tablets, lectores, WiFi.
+   - Respaldo de la información.
+   - Normativa: ARCA (comprobantes), ANMAT (registros de lote), Ley 25.326 (datos personales) y Ley 25.506 (firma digital y electrónica).
+5. **Cambio cultural:** referente por sector, capacitación y convivencia papel + digital durante cada piloto.
+6. **Indicador general:** porcentaje de procesos sin papel, medido etapa por etapa.
+
+---
+
 **En curso:** Proyecto 1, código de barras y ubicaciones.
 Los proyectos de esta lista se relevan y se priorizan cuando termine el Proyecto 1.
 
