@@ -1,10 +1,10 @@
 # Proyectos futuros (backlog)
 
-## Visión del proyecto integral: empresa sin papel
+## Visión del proyecto integral: otra forma de trabajar
 
-**Objetivo:** que cada operación quede registrada en el sistema, sea trazable y se pueda medir. El papel deja de ser el control.
+**Objetivo:** mostrar que cada operación se puede registrar en el sistema, rastrear y medir. No se busca eliminar todo el papel, sino que el control esté en el sistema.
 
-Se hace por etapas. Cada papel se reemplaza recién cuando su versión digital está probada.
+**Gerencia asigna las prioridades.** El mapa es un menú de opciones, y cada papel se reemplaza recién cuando su versión digital está probada.
 
 ### Mapa de papeles a digitalizar (a confirmar con el censo)
 
@@ -34,7 +34,7 @@ Se hace por etapas. Cada papel se reemplaza recién cuando su versión digital e
    - Respaldo de la información.
    - Normativa: ARCA (comprobantes), ANMAT (registros de lote), Ley 25.326 (datos personales) y Ley 25.506 (firma digital y electrónica).
 5. **Cambio cultural:** referente por sector, capacitación y convivencia papel + digital durante cada piloto.
-6. **Indicador general:** porcentaje de procesos sin papel, medido etapa por etapa.
+6. **Indicador general:** procesos con control en el sistema, medido etapa por etapa.
 
 ---
 
